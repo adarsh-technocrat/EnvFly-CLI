@@ -1,0 +1,122 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "EnvFly CLI",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#60A5FA",
+    "dark": "#1D4ED8",
+    "anchors": {
+      "from": "#3B82F6",
+      "to": "#1D4ED8"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/adarsh-technocrat/EnvFly-CLI"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "/getting-started"
+  },
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "simple-icons:github",
+      "url": "https://github.com/adarsh-technocrat/EnvFly-CLI"
+    },
+    {
+      "name": "Discord",
+      "icon": "simple-icons:discord",
+      "url": "https://discord.gg/envfly"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "getting-started",
+        "installation"
+      ]
+    },
+    {
+      "group": "Core Concepts",
+      "pages": [
+        "concepts/environments",
+        "concepts/storage-providers",
+        "concepts/teams",
+        "concepts/security"
+      ]
+    },
+    {
+      "group": "Commands",
+      "pages": [
+        "commands/init",
+        "commands/login",
+        "commands/list",
+        "commands/push",
+        "commands/pull",
+        "commands/sync",
+        "commands/team",
+        "commands/history",
+        "commands/audit"
+      ]
+    },
+    {
+      "group": "Storage Providers",
+      "pages": [
+        "providers/git",
+        "providers/aws",
+        "providers/azure",
+        "providers/google",
+        "providers/envfly-cloud"
+      ]
+    },
+    {
+      "group": "Configuration",
+      "pages": [
+        "configuration/envfly-file",
+        "configuration/environment-variables",
+        "configuration/encryption"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api/authentication",
+        "api/teams",
+        "api/environments",
+        "api/projects"
+      ]
+    },
+    {
+      "group": "Deployment",
+      "pages": [
+        "deployment/backend-setup",
+        "deployment/azure-deployment",
+        "deployment/aws-deployment",
+        "deployment/docker"
+      ]
+    },
+    {
+      "group": "Examples",
+      "pages": [
+        "examples/nodejs-project",
+        "examples/react-app",
+        "examples/microservices"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "twitter": "https://twitter.com/envfly",
+    "github": "https://github.com/adarsh-technocrat/EnvFly-CLI",
+    "discord": "https://discord.gg/envfly"
+  }
+} 

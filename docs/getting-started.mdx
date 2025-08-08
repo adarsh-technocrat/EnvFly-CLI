@@ -1,0 +1,245 @@
+---
+title: "Getting Started"
+description: "Quick start guide to get up and running with EnvFly CLI"
+---
+
+# Getting Started with EnvFly CLI
+
+This guide will walk you through installing EnvFly CLI and setting up your first project.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- **Node.js** 14.0.0 or higher
+- **npm** or **yarn** package manager
+- **Git** (for Git storage provider)
+
+<Callout type="info">
+  You can check your Node.js version with `node --version` and npm version with
+  `npm --version`.
+</Callout>
+
+## Installation
+
+### Option 1: Install from npm (Recommended)
+
+```bash
+npm install -g envfly-cli
+```
+
+### Option 2: Install from source
+
+```bash
+git clone https://github.com/adarsh-technocrat/EnvFly-CLI.git
+cd EnvFly-CLI
+npm install
+npm link
+```
+
+### Verify Installation
+
+```bash
+envfly --version
+```
+
+You should see the current version of EnvFly CLI.
+
+## Quick Setup
+
+### 1. Initialize EnvFly in Your Project
+
+Navigate to your project directory and run:
+
+```bash
+envfly init
+```
+
+This will start an interactive setup process:
+
+<Steps>
+  <Step title="Project Name">
+    Enter a name for your project (defaults to directory name)
+  </Step>
+  <Step title="Storage Provider">
+    Choose where to store your environment variables: - **Git Repository**:
+    Store encrypted files in your Git repo - **AWS Secrets Manager**: Use AWS
+    for enterprise-grade storage - **Azure Key Vault**: Use Azure Key Vault -
+    **Google Secret Manager**: Use Google Cloud - **EnvFly Cloud Service**: Use
+    EnvFly's hosted service
+  </Step>
+  <Step title="Configuration">Configure your chosen storage provider</Step>
+</Steps>
+
+### 2. Create Your First Environment
+
+After initialization, create a `.env.production` file:
+
+```bash
+# .env.production
+DATABASE_URL=postgresql://user:pass@prod-db:5432/mydb
+API_KEY=your_production_api_key
+REDIS_URL=redis://prod-redis:6379
+NODE_ENV=production
+```
+
+### 3. Push to Storage
+
+```bash
+envfly push production
+```
+
+This will encrypt and store your environment variables securely.
+
+### 4. Share with Your Team
+
+If using EnvFly Cloud Service:
+
+```bash
+# Create a team
+envfly team create "Development Team"
+
+# Invite team members
+envfly team invite alice@company.com developer
+envfly team invite bob@company.com readonly
+```
+
+## Basic Workflow
+
+Here's the typical workflow for using EnvFly CLI:
+
+<Mermaid>
+  graph LR A[Create .env file] --> B[envfly push] B --> C[Team members pull] C
+  --> D[Make changes] D --> E[envfly push] E --> F[Others sync]
+</Mermaid>
+
+### Common Commands
+
+```bash
+# List available environments
+envfly list
+
+# Push local environment to storage
+envfly push production
+
+# Pull environment from storage
+envfly pull production
+
+# Sync environment (merge local and remote)
+envfly sync production
+
+# View environment history
+envfly history production
+
+# View audit logs
+envfly audit production
+```
+
+## Storage Provider Setup
+
+### Git Repository (Recommended for small teams)
+
+```bash
+envfly init
+# Choose: Git Repository
+# Enter encryption key
+# Set environment files path
+```
+
+**Pros:**
+
+- ✅ No external dependencies
+- ✅ Full version control
+- ✅ Works offline
+- ✅ Free
+
+**Cons:**
+
+- ❌ Requires encryption key management
+- ❌ Limited team features
+
+### EnvFly Cloud Service (Recommended for teams)
+
+```bash
+# First, authenticate
+envfly login
+
+# Then initialize
+envfly init
+# Choose: EnvFly Cloud Service
+# Set up team access
+```
+
+**Pros:**
+
+- ✅ Built-in team management
+- ✅ Role-based access control
+- ✅ Audit logs
+- ✅ No key management
+
+**Cons:**
+
+- ❌ Requires internet connection
+- ❌ May have usage limits
+
+### AWS Secrets Manager (Enterprise)
+
+```bash
+envfly init
+# Choose: AWS Secrets Manager
+# Configure AWS region and prefix
+```
+
+**Requirements:**
+
+- AWS credentials configured (`aws configure`)
+- Secrets Manager access permissions
+
+## Next Steps
+
+<Grid cols={2}>
+  <Card title="Learn Commands" href="/commands/init">
+    Explore all available CLI commands and their options.
+  </Card>
+  <Card title="Team Management" href="/concepts/teams">
+    Set up teams, invite members, and manage permissions.
+  </Card>
+  <Card title="Security Features" href="/concepts/security">
+    Understand encryption, access control, and security best practices.
+  </Card>
+  <Card title="Examples" href="/examples/nodejs-project">
+    See real-world examples and use cases.
+  </Card>
+</Grid>
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Installation fails">
+    Make sure you have Node.js 14+ installed and try: ```bash npm cache clean
+    --force npm install -g envfly-cli ```
+  </Accordion>
+  <Accordion title="Authentication errors">
+    For EnvFly Cloud Service, make sure you're logged in: ```bash envfly login
+    ```
+  </Accordion>
+  <Accordion title="Storage provider connection fails">
+    Check your configuration and credentials: ```bash # For AWS aws configure #
+    For Azure az login # For Google Cloud gcloud auth application-default login
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Getting Help
+
+- **Documentation**: Browse the rest of this documentation
+- **GitHub Issues**: [Report bugs](https://github.com/adarsh-technocrat/EnvFly-CLI/issues)
+- **Discord**: [Join our community](https://discord.gg/envfly)
+- **Email**: support@envfly.io
+
+<Callout type="success">
+  Congratulations! You've successfully set up EnvFly CLI. Now explore the
+  [commands](/commands/init) to learn more about what you can do.
+</Callout>{" "}

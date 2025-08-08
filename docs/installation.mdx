@@ -1,0 +1,315 @@
+---
+title: "Installation"
+description: "Install EnvFly CLI on your system"
+---
+
+# Installation
+
+This guide covers installing EnvFly CLI on different operating systems and package managers.
+
+## Prerequisites
+
+Before installing EnvFly CLI, ensure you have:
+
+- **Node.js** 14.0.0 or higher
+- **npm** or **yarn** package manager
+- **Git** (for Git storage provider)
+
+<Callout type="info">
+  You can check your Node.js version with `node --version` and npm version with
+  `npm --version`.
+</Callout>
+
+## Quick Install
+
+### npm (Recommended)
+
+```bash
+npm install -g envfly-cli
+```
+
+### yarn
+
+```bash
+yarn global add envfly-cli
+```
+
+### pnpm
+
+```bash
+pnpm add -g envfly-cli
+```
+
+## Verify Installation
+
+After installation, verify that EnvFly CLI is working:
+
+```bash
+envfly --version
+```
+
+You should see output similar to:
+
+```
+envfly-cli/1.0.0
+```
+
+## Platform-Specific Installation
+
+### macOS
+
+#### Using Homebrew
+
+```bash
+# Install Homebrew if you haven't already
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install EnvFly CLI
+brew install envfly-cli
+```
+
+#### Using npm
+
+```bash
+npm install -g envfly-cli
+```
+
+### Linux
+
+#### Ubuntu/Debian
+
+```bash
+# Update package list
+sudo apt update
+
+# Install Node.js and npm (if not already installed)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install EnvFly CLI
+sudo npm install -g envfly-cli
+```
+
+#### CentOS/RHEL/Fedora
+
+```bash
+# Install Node.js and npm (if not already installed)
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
+
+# Install EnvFly CLI
+sudo npm install -g envfly-cli
+```
+
+#### Arch Linux
+
+```bash
+# Install Node.js and npm (if not already installed)
+sudo pacman -S nodejs npm
+
+# Install EnvFly CLI
+sudo npm install -g envfly-cli
+```
+
+### Windows
+
+#### Using Chocolatey
+
+```bash
+# Install Chocolatey if you haven't already
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# Install EnvFly CLI
+choco install envfly-cli
+```
+
+#### Using npm
+
+```bash
+npm install -g envfly-cli
+```
+
+#### Using Scoop
+
+```bash
+# Install Scoop if you haven't already
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+
+# Install EnvFly CLI
+scoop install envfly-cli
+```
+
+## Development Installation
+
+If you want to install from source for development:
+
+```bash
+# Clone the repository
+git clone https://github.com/adarsh-technocrat/EnvFly-CLI.git
+cd EnvFly-CLI
+
+# Install dependencies
+npm install
+
+# Link globally for development
+npm link
+```
+
+## Docker Installation
+
+You can also run EnvFly CLI using Docker:
+
+```bash
+# Pull the image
+docker pull envfly/cli:latest
+
+# Run commands
+docker run --rm -v $(pwd):/workspace envfly/cli:latest init
+docker run --rm -v $(pwd):/workspace envfly/cli:latest list
+```
+
+## Installation Options
+
+### Global vs Local Installation
+
+<Grid cols={2}>
+  <Card title="Global Installation">
+    ```bash npm install -g envfly-cli ``` - Available system-wide - Can be used
+    in any directory - Requires admin privileges - Good for personal use
+  </Card>
+  <Card title="Local Installation">
+    ```bash npm install envfly-cli npx envfly init ``` - Project-specific
+    installation - No admin privileges required - Version controlled per project
+    - Good for CI/CD pipelines
+  </Card>
+</Grid>
+
+### Version Management
+
+#### Using nvm (Node Version Manager)
+
+```bash
+# Install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Install specific Node.js version
+nvm install 18
+nvm use 18
+
+# Install EnvFly CLI
+npm install -g envfly-cli
+```
+
+#### Using fnm (Fast Node Manager)
+
+```bash
+# Install fnm
+curl -fsSL https://fnm.vercel.app/install | bash
+
+# Install specific Node.js version
+fnm install 18
+fnm use 18
+
+# Install EnvFly CLI
+npm install -g envfly-cli
+```
+
+## Troubleshooting
+
+### Common Installation Issues
+
+<AccordionGroup>
+  <Accordion title="Permission Denied">
+    **Error**: `EACCES: permission denied` **Solution**: Use a different
+    installation method or fix permissions: ```bash # Option 1: Use npx (no
+    global install needed) npx envfly-cli init # Option 2: Fix npm permissions
+    sudo chown -R $USER /usr/local/lib/node_modules # Option 3: Use a different
+    directory npm config set prefix ~/.npm-global export
+    PATH=~/.npm-global/bin:$PATH ```
+  </Accordion>
+  <Accordion title="Node.js Version Too Old">
+    **Error**: `requires Node.js version >= 14.0.0` **Solution**: Update
+    Node.js: ```bash # Using nvm nvm install 18 nvm use 18 # Or download from
+    nodejs.org # https://nodejs.org/ ```
+  </Accordion>
+  <Accordion title="Command Not Found">
+    **Error**: `envfly: command not found` **Solution**: Check your PATH and
+    reinstall: ```bash # Check if installed npm list -g envfly-cli # Reinstall
+    npm uninstall -g envfly-cli npm install -g envfly-cli # Check PATH echo
+    $PATH which node ```
+  </Accordion>
+  <Accordion title="Network Issues">
+    **Error**: Network timeout or connection refused **Solution**: Check your
+    network and npm configuration: ```bash # Check npm configuration npm config
+    list # Use a different registry if needed npm config set registry
+    https://registry.npmjs.org/ # Clear npm cache npm cache clean --force ```
+  </Accordion>
+</AccordionGroup>
+
+### Platform-Specific Issues
+
+#### macOS Issues
+
+```bash
+# If you get permission errors on macOS
+sudo npm install -g envfly-cli
+
+# Or use Homebrew for better permission management
+brew install envfly-cli
+```
+
+#### Windows Issues
+
+```bash
+# If PowerShell execution policy blocks installation
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# If you get path issues, restart your terminal after installation
+```
+
+#### Linux Issues
+
+```bash
+# If you get permission errors on Linux
+sudo npm install -g envfly-cli
+
+# Or install for current user only
+npm install -g envfly-cli --prefix ~/.npm-global
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+## Uninstallation
+
+To remove EnvFly CLI:
+
+```bash
+# Using npm
+npm uninstall -g envfly-cli
+
+# Using yarn
+yarn global remove envfly-cli
+
+# Using pnpm
+pnpm remove -g envfly-cli
+
+# Using Homebrew (macOS)
+brew uninstall envfly-cli
+
+# Using Chocolatey (Windows)
+choco uninstall envfly-cli
+```
+
+## Next Steps
+
+After successful installation:
+
+1. **Initialize a project**: `envfly init`
+2. **Check available commands**: `envfly --help`
+3. **Read the getting started guide**: [Getting Started](/getting-started)
+
+<Callout type="success">
+  EnvFly CLI is now installed! Run `envfly --help` to see all available
+  commands.
+</Callout>{" "}

@@ -1,0 +1,308 @@
+---
+title: "envfly init"
+description: "Initialize EnvFly in your current project"
+---
+
+# envfly init
+
+Initialize EnvFly in your current project with storage provider selection.
+
+## Usage
+
+```bash
+envfly init
+```
+
+## Description
+
+The `init` command sets up EnvFly in your current project directory. It creates a `.envfly` configuration file and guides you through selecting a storage provider for your environment variables.
+
+## Interactive Setup
+
+When you run `envfly init`, you'll be prompted to configure:
+
+### 1. Project Name
+
+Enter a name for your project. This defaults to your current directory name.
+
+```bash
+Project name: my-awesome-app
+```
+
+### 2. Storage Provider
+
+Choose where to store your environment variables:
+
+<Grid cols={2}>
+  <Card title="Git Repository">
+    Store encrypted files in your Git repository - ✅ No external dependencies -
+    ✅ Full version control - ✅ Works offline
+  </Card>
+  <Card title="AWS Secrets Manager">
+    Use AWS for enterprise-grade storage - ✅ Enterprise security - ✅ IAM
+    integration - ✅ Audit logging
+  </Card>
+  <Card title="Azure Key Vault">
+    Use Azure Key Vault for storage - ✅ Azure integration - ✅ Managed
+    identities - ✅ Compliance ready
+  </Card>
+  <Card title="Google Secret Manager">
+    Use Google Cloud Secret Manager - ✅ GCP integration - ✅ Fine-grained
+    access - ✅ Automatic rotation
+  </Card>
+  <Card title="EnvFly Cloud Service">
+    Use EnvFly's hosted service - ✅ Built-in team features - ✅ No setup
+    required - ✅ Managed security
+  </Card>
+</Grid>
+
+### 3. Storage Provider Configuration
+
+Depending on your choice, you'll configure specific settings:
+
+#### Git Repository
+
+```bash
+Enter encryption key for Git storage: ********
+Environment files path in Git repo: .envfly-environments
+```
+
+#### AWS Secrets Manager
+
+```bash
+AWS region: us-east-1
+Secret name prefix: envfly
+```
+
+#### Azure Key Vault
+
+```bash
+Azure Key Vault URL: https://myvault.vault.azure.net/
+Secret name prefix: envfly
+```
+
+#### Google Secret Manager
+
+```bash
+Google Cloud Project ID: my-project-123
+Secret name prefix: envfly
+```
+
+#### EnvFly Cloud Service
+
+If you choose EnvFly Cloud Service, you'll need to authenticate first:
+
+```bash
+envfly login
+```
+
+Then configure team access:
+
+```bash
+How would you like to set up team access?
+❯ Select existing team
+  Create new team
+  Join team with invite code
+  Skip team setup (local only)
+```
+
+## Generated Configuration
+
+After initialization, a `.envfly` file is created in your project root:
+
+```json
+{
+  "version": "1.0",
+  "project_id": "my-awesome-app-abc123",
+  "project_name": "my-awesome-app",
+  "team_id": "team_xyz789",
+  "environments": {
+    "prod-api": {
+      "remote_id": null,
+      "description": "Production API environment",
+      "file": ".env.production"
+    },
+    "staging-api": {
+      "remote_id": null,
+      "description": "Staging API environment",
+      "file": ".env.staging"
+    },
+    "dev-api": {
+      "remote_id": null,
+      "description": "Development API environment",
+      "file": ".env.development"
+    }
+  },
+  "storage": {
+    "provider": "git",
+    "config": {
+      "encryption_key": "your-encryption-key",
+      "git": {
+        "env_path": ".envfly-environments"
+      }
+    }
+  },
+  "auth": {
+    "endpoint": "https://api.envfly.io/v1",
+    "encryption": {
+      "enabled": true,
+      "algorithm": "aes-256-gcm"
+    }
+  },
+  "sync": {
+    "auto_backup": true,
+    "conflict_resolution": "prompt",
+    "audit_logs": true
+  }
+}
+```
+
+## Sample Environment Files
+
+If you choose to create sample environment files, the following files will be created:
+
+### .env.production
+
+```bash
+# Production Environment Variables
+DATABASE_URL=postgresql://user:pass@prod-db:5432/mydb
+API_KEY=prod_api_key_here
+REDIS_URL=redis://prod-redis:6379
+LOG_LEVEL=error
+NODE_ENV=production
+```
+
+### .env.staging
+
+```bash
+# Staging Environment Variables
+DATABASE_URL=postgresql://user:pass@staging-db:5432/mydb
+API_KEY=staging_api_key_here
+REDIS_URL=redis://staging-redis:6379
+LOG_LEVEL=warn
+NODE_ENV=staging
+```
+
+### .env.development
+
+```bash
+# Development Environment Variables
+DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
+API_KEY=dev_api_key_here
+REDIS_URL=redis://localhost:6379
+LOG_LEVEL=debug
+NODE_ENV=development
+```
+
+## Options
+
+Currently, `envfly init` doesn't accept any command-line options. All configuration is done through the interactive prompts.
+
+## Examples
+
+### Basic Initialization
+
+```bash
+$ envfly init
+Welcome to EnvFly CLI!
+
+This will initialize EnvFly in your current project.
+You'll be able to sync environment variables across your team.
+
+Project name: my-app
+Choose storage provider for environment variables:
+❯ Git Repository (encrypted) - Store in your Git repo
+  AWS Secrets Manager - Store in AWS
+  Azure Key Vault - Store in Azure
+  Google Secret Manager - Store in Google Cloud
+  EnvFly Cloud Service - Use EnvFly hosted service
+
+Enter encryption key for Git storage: ********
+Environment files path in Git repo: .envfly-environments
+
+Create sample environment files? Yes
+Enable encryption for environment variables? Yes
+Enable audit logs for environment changes? Yes
+
+EnvFly has been initialized successfully!
+
+Project: my-app
+Storage: Git Repository
+Team: Local only
+Configuration: .envfly
+
+Next steps:
+1. Run envfly list to see available environments
+2. Run envfly sync <environment> to sync an environment
+3. Run envfly push <environment> to store environment variables
+```
+
+### With EnvFly Cloud Service
+
+```bash
+$ envfly login
+API Key: ********
+
+$ envfly init
+Project name: team-project
+Choose storage provider: EnvFly Cloud Service
+
+How would you like to set up team access?
+❯ Create new team
+  Select existing team
+  Join team with invite code
+
+Team name: Backend Team
+
+Team "Backend Team" created successfully!
+Team ID: team_abc123
+Invite Code: ABC123XYZ
+
+Share this invite code with your team members:
+envfly team join ABC123XYZ
+```
+
+## Error Handling
+
+### Already Initialized
+
+If EnvFly is already initialized in the current directory:
+
+```bash
+$ envfly init
+Error: EnvFly is already initialized in this project.
+
+If you want to reinitialize, please remove the .envfly file first.
+```
+
+### Authentication Required
+
+If you choose EnvFly Cloud Service without being authenticated:
+
+```bash
+$ envfly init
+Error: You need to authenticate first. Please run "envfly login" before initializing.
+```
+
+### Storage Provider Test Failure
+
+If the storage provider connection test fails:
+
+```bash
+$ envfly init
+Error: Storage provider test failed: Could not connect to AWS Secrets Manager
+```
+
+## Next Steps
+
+After initialization, you can:
+
+1. **List environments**: `envfly list`
+2. **Push environment**: `envfly push production`
+3. **Pull environment**: `envfly pull production`
+4. **Sync environment**: `envfly sync production`
+
+<Callout type="info">
+  The `.envfly` file contains sensitive information like encryption keys. Make
+  sure to add it to your `.gitignore` file if using Git storage.
+</Callout>{" "}

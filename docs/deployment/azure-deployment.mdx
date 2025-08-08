@@ -1,0 +1,483 @@
+---
+title: "Azure Deployment"
+description: "Deploy EnvFly backend to Azure with Container Instances and Cosmos DB"
+---
+
+# Azure Deployment Guide
+
+This guide will walk you through deploying the EnvFly backend to Azure using Container Instances, Cosmos DB, and other Azure services.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- **Azure CLI** installed and configured
+- **Docker** installed
+- **Azure subscription** with appropriate permissions
+- **Git** for cloning the repository
+
+<Callout type="info">
+  You can install Azure CLI from [Microsoft's official
+  guide](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+</Callout>
+
+## Quick Deployment
+
+The easiest way to deploy is using our automated deployment script:
+
+```bash
+# Clone the repository
+git clone https://github.com/adarsh-technocrat/EnvFly-CLI.git
+cd EnvFly-CLI/backend
+
+# Run the deployment script
+chmod +x scripts/deploy-azure.sh
+./scripts/deploy-azure.sh
+```
+
+The script will guide you through the entire deployment process.
+
+## Manual Deployment
+
+If you prefer to deploy manually or need custom configuration, follow these steps:
+
+### 1. Create Resource Group
+
+```bash
+# Create resource group
+az group create \
+  --name envfly-rg \
+  --location eastus
+```
+
+### 2. Create Container Registry
+
+```bash
+# Create Azure Container Registry
+az acr create \
+  --resource-group envfly-rg \
+  --name envflyacr \
+  --sku Basic \
+  --admin-enabled true
+
+# Get registry credentials
+REGISTRY_LOGIN_SERVER=$(az acr show \
+  --name envflyacr \
+  --resource-group envfly-rg \
+  --query loginServer \
+  --output tsv)
+
+REGISTRY_USERNAME=$(az acr credential show \
+  --name envflyacr \
+  --resource-group envfly-rg \
+  --query username \
+  --output tsv)
+
+REGISTRY_PASSWORD=$(az acr credential show \
+  --name envflyacr \
+  --resource-group envfly-rg \
+  --query passwords[0].value \
+  --output tsv)
+```
+
+### 3. Build and Push Docker Image
+
+```bash
+# Login to registry
+az acr login --name envflyacr --resource-group envfly-rg
+
+# Build image
+docker build -t envfly-backend .
+
+# Tag image
+docker tag envfly-backend:latest $REGISTRY_LOGIN_SERVER/envfly-backend:latest
+
+# Push image
+docker push $REGISTRY_LOGIN_SERVER/envfly-backend:latest
+```
+
+### 4. Create Cosmos DB Account
+
+```bash
+# Create Cosmos DB account
+az cosmosdb create \
+  --name envflycosmos \
+  --resource-group envfly-rg \
+  --kind MongoDB \
+  --capabilities EnableMongo
+
+# Get connection string
+COSMOS_CONNECTION_STRING=$(az cosmosdb keys list \
+  --name envflycosmos \
+  --resource-group envfly-rg \
+  --type connection-strings \
+  --query connectionStrings[0].connectionString \
+  --output tsv)
+
+# Create database
+az cosmosdb mongodb database create \
+  --account-name envflycosmos \
+  --resource-group envfly-rg \
+  --name envfly
+```
+
+### 5. Create Application Insights
+
+```bash
+# Create Application Insights
+az monitor app-insights component create \
+  --app envfly-insights \
+  --location eastus \
+  --resource-group envfly-rg \
+  --application-type web
+
+# Get instrumentation key
+INSTRUMENTATION_KEY=$(az monitor app-insights component show \
+  --app envfly-insights \
+  --resource-group envfly-rg \
+  --query instrumentationKey \
+  --output tsv)
+```
+
+### 6. Create Key Vault
+
+```bash
+# Get current user object ID
+USER_OBJECT_ID=$(az ad signed-in-user show --query objectId --output tsv)
+
+# Create Key Vault
+az keyvault create \
+  --name envflykv \
+  --resource-group envfly-rg \
+  --location eastus \
+  --enabled-for-deployment true \
+  --enabled-for-disk-encryption true \
+  --enabled-for-template-deployment true
+
+# Set access policy
+az keyvault set-policy \
+  --name envflykv \
+  --resource-group envfly-rg \
+  --object-id $USER_OBJECT_ID \
+  --secret-permissions get set list delete
+
+# Generate JWT secret
+JWT_SECRET=$(openssl rand -base64 64)
+
+# Store secrets
+az keyvault secret set \
+  --vault-name envflykv \
+  --name "JWT-SECRET" \
+  --value "$JWT_SECRET"
+
+az keyvault secret set \
+  --vault-name envflykv \
+  --name "MONGODB-URI" \
+  --value "$COSMOS_CONNECTION_STRING"
+```
+
+### 7. Create Container Instance
+
+```bash
+# Create container instance
+az container create \
+  --resource-group envfly-rg \
+  --name envfly-backend \
+  --image $REGISTRY_LOGIN_SERVER/envfly-backend:latest \
+  --cpu 1 \
+  --memory 2 \
+  --ports 3000 \
+  --dns-name-label envfly-backend \
+  --environment-variables \
+    NODE_ENV=production \
+    PORT=3000 \
+    MONGODB_URI="$COSMOS_CONNECTION_STRING" \
+    JWT_SECRET="$JWT_SECRET" \
+    CORS_ORIGINS="*" \
+  --registry-login-server $REGISTRY_LOGIN_SERVER \
+  --registry-username $REGISTRY_USERNAME \
+  --registry-password $REGISTRY_PASSWORD
+
+# Get container instance FQDN
+CONTAINER_FQDN=$(az container show \
+  --resource-group envfly-rg \
+  --name envfly-backend \
+  --query ipAddress.fqdn \
+  --output tsv)
+```
+
+### 8. Create Front Door (Optional)
+
+For global distribution and SSL termination:
+
+```bash
+# Create Front Door
+az network front-door create \
+  --resource-group envfly-rg \
+  --name envfly-fd \
+  --backend-address $CONTAINER_FQDN
+
+# Get Front Door hostname
+FRONT_DOOR_HOSTNAME=$(az network front-door show \
+  --resource-group envfly-rg \
+  --name envfly-fd \
+  --query frontendEndpoints[0].hostName \
+  --output tsv)
+```
+
+## Configuration
+
+### Environment Variables
+
+The following environment variables are configured:
+
+| Variable       | Description                 | Example            |
+| -------------- | --------------------------- | ------------------ |
+| `NODE_ENV`     | Environment mode            | `production`       |
+| `PORT`         | Server port                 | `3000`             |
+| `MONGODB_URI`  | Cosmos DB connection string | `mongodb://...`    |
+| `JWT_SECRET`   | JWT signing secret          | `generated-secret` |
+| `CORS_ORIGINS` | Allowed CORS origins        | `*`                |
+
+### Custom Configuration
+
+You can customize the deployment by modifying the script or using Azure CLI parameters:
+
+```bash
+# Custom resource names
+RESOURCE_GROUP="my-envfly-rg"
+LOCATION="westus2"
+CONTAINER_CPU="2"
+CONTAINER_MEMORY="4"
+DB_TIER="M10"
+
+# Deploy with custom settings
+./scripts/deploy-azure.sh \
+  --resource-group $RESOURCE_GROUP \
+  --location $LOCATION \
+  --cpu $CONTAINER_CPU \
+  --memory $CONTAINER_MEMORY \
+  --db-tier $DB_TIER
+```
+
+## Cost Estimation
+
+**Monthly costs (approximate):**
+
+<Grid cols={2}>
+  <Card title="Basic Setup">
+    - Container Registry (Basic): $3/month - Cosmos DB (M0): Free tier -
+    Container Instances: $30/month - Application Insights: Free tier - Key
+    Vault: Free tier - **Total: ~$33/month**
+  </Card>
+  <Card title="Production Setup">
+    - Container Registry (Standard): $5/month - Cosmos DB (M10): $25/month -
+    Container Instances: $60/month - Application Insights: $5/month - Key Vault:
+    $1/month - Front Door: $1/month - **Total: ~$97/month**
+  </Card>
+</Grid>
+
+## Security Considerations
+
+### Network Security
+
+<AccordionGroup>
+  <Accordion title="Private Networking">
+    For enhanced security, consider: - Azure Virtual Network - Private Link for
+    Cosmos DB - Application Gateway - Network Security Groups
+  </Accordion>
+  <Accordion title="SSL/TLS">
+    - Front Door provides SSL termination - Container instances use HTTPS -
+    Cosmos DB connections are encrypted
+  </Accordion>
+  <Accordion title="Access Control">
+    - Azure AD integration - Managed identities - Role-based access control
+  </Accordion>
+</AccordionGroup>
+
+### Data Protection
+
+- **Encryption at rest**: Cosmos DB and Key Vault encrypt data
+- **Encryption in transit**: All connections use TLS
+- **Key management**: Azure Key Vault manages secrets
+- **Backup**: Cosmos DB provides automatic backups
+
+## Monitoring and Logging
+
+### Application Insights
+
+Monitor your application with:
+
+```bash
+# View application insights
+az monitor app-insights component show \
+  --app envfly-insights \
+  --resource-group envfly-rg
+```
+
+**Available metrics:**
+
+- Request rates and response times
+- Error rates and exceptions
+- Custom metrics and events
+- Performance counters
+
+### Container Logs
+
+```bash
+# View container logs
+az container logs \
+  --resource-group envfly-rg \
+  --name envfly-backend \
+  --follow
+```
+
+### Azure Monitor
+
+```bash
+# Set up alerts
+az monitor metrics alert create \
+  --name "envfly-cpu-alert" \
+  --resource-group envfly-rg \
+  --scopes "/subscriptions/.../resourceGroups/envfly-rg/providers/Microsoft.ContainerInstance/containerGroups/envfly-backend" \
+  --condition "avg Percentage CPU > 80" \
+  --description "High CPU usage alert"
+```
+
+## Scaling
+
+### Horizontal Scaling
+
+```bash
+# Scale container instances
+az container create \
+  --resource-group envfly-rg \
+  --name envfly-backend-2 \
+  --image $REGISTRY_LOGIN_SERVER/envfly-backend:latest \
+  # ... other parameters
+```
+
+### Database Scaling
+
+```bash
+# Scale Cosmos DB
+az cosmosdb update \
+  --name envflycosmos \
+  --resource-group envfly-rg \
+  --capabilities EnableMongo \
+  --locations regionName=eastus failoverPriority=0 isZoneRedundant=false
+```
+
+## Updates and Maintenance
+
+### Update Application
+
+```bash
+# Build new image
+docker build -t envfly-backend:v2 .
+
+# Tag and push
+docker tag envfly-backend:v2 $REGISTRY_LOGIN_SERVER/envfly-backend:v2
+docker push $REGISTRY_LOGIN_SERVER/envfly-backend:v2
+
+# Update container instance
+az container create \
+  --resource-group envfly-rg \
+  --name envfly-backend-v2 \
+  --image $REGISTRY_LOGIN_SERVER/envfly-backend:v2 \
+  # ... other parameters
+```
+
+### Backup and Recovery
+
+```bash
+# Backup Cosmos DB
+az cosmosdb mongodb collection backup create \
+  --account-name envflycosmos \
+  --resource-group envfly-rg \
+  --database-name envfly \
+  --collection-name environments
+
+# Restore from backup
+az cosmosdb mongodb collection restore \
+  --account-name envflycosmos \
+  --resource-group envfly-rg \
+  --database-name envfly \
+  --collection-name environments \
+  --restore-timestamp "2024-01-15T10:30:00Z"
+```
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Container won't start">
+    Check container logs: ```bash az container logs --resource-group envfly-rg
+    --name envfly-backend ```
+  </Accordion>
+  <Accordion title="Database connection issues">
+    Verify Cosmos DB connection: ```bash az cosmosdb show --name envflycosmos
+    --resource-group envfly-rg ```
+  </Accordion>
+  <Accordion title="Authentication errors">
+    Check Key Vault access: ```bash az keyvault show --name envflykv
+    --resource-group envfly-rg ```
+  </Accordion>
+</AccordionGroup>
+
+### Health Checks
+
+```bash
+# Check container health
+curl http://$CONTAINER_FQDN:3000/health
+
+# Check database health
+curl http://$CONTAINER_FQDN:3000/health/db
+```
+
+## Cleanup
+
+To remove all resources:
+
+```bash
+# Delete resource group (removes everything)
+az group delete --name envfly-rg --yes --no-wait
+```
+
+Or use the cleanup script:
+
+```bash
+./scripts/destroy-azure.sh
+```
+
+## Next Steps
+
+After deployment:
+
+1. **Configure CLI**: Update your EnvFly CLI configuration
+2. **Test API**: Verify all endpoints are working
+3. **Set up monitoring**: Configure alerts and dashboards
+4. **Security review**: Audit access controls and permissions
+5. **Documentation**: Update team documentation
+
+<Callout type="success">
+  Your EnvFly backend is now deployed on Azure! Check the [deployment
+  summary](#deployment-summary) for your endpoints and next steps.
+</Callout>
+
+## Deployment Summary
+
+After successful deployment, you'll have:
+
+- **API Endpoint**: `http://envfly-backend.eastus.azurecontainer.io:3000`
+- **Health Check**: `http://envfly-backend.eastus.azurecontainer.io:3000/health`
+- **Front Door URL**: `https://envfly-fd.azurefd.net` (if enabled)
+- **Cosmos DB**: `envflycosmos` account with `envfly` database
+- **Key Vault**: `envflykv` for secret management
+- **Application Insights**: `envfly-insights` for monitoring
+
+<Callout type="info">
+  For production deployments, consider using Azure Kubernetes Service (AKS) for
+  better scalability and management.
+</Callout>{" "}

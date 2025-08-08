@@ -1,0 +1,364 @@
+---
+title: "Environments"
+description: "Understanding environments in EnvFly CLI"
+---
+
+# Environments
+
+Environments in EnvFly CLI represent different deployment stages or configurations for your application. Each environment contains a set of environment variables that are specific to that deployment context.
+
+## What are Environments?
+
+Environments are logical groupings of environment variables that correspond to different stages of your application lifecycle:
+
+<Grid cols={3}>
+  <Card title="Development">
+    Local development environment - Database: localhost - Logging: debug level -
+    Features: experimental
+  </Card>
+  <Card title="Staging">
+    Pre-production testing - Database: staging cluster - Logging: info level -
+    Features: production-like
+  </Card>
+  <Card title="Production">
+    Live application - Database: production cluster - Logging: error level -
+    Features: stable only
+  </Card>
+</Grid>
+
+## Environment Structure
+
+Each environment in EnvFly has the following structure:
+
+```json
+{
+  "production": {
+    "remote_id": "env_prod_123",
+    "description": "Production environment",
+    "file": ".env.production",
+    "last_push": "2024-01-15T10:30:00Z",
+    "last_pull": "2024-01-15T09:15:00Z",
+    "version": 5,
+    "variables": {
+      "DATABASE_URL": "postgresql://user:pass@prod-db:5432/mydb",
+      "API_KEY": "prod_api_key_here",
+      "REDIS_URL": "redis://prod-redis:6379",
+      "NODE_ENV": "production"
+    }
+  }
+}
+```
+
+### Environment Properties
+
+| Property      | Description                  | Example                  |
+| ------------- | ---------------------------- | ------------------------ |
+| `remote_id`   | Unique identifier in storage | `env_prod_123`           |
+| `description` | Human-readable description   | `Production environment` |
+| `file`        | Local file path              | `.env.production`        |
+| `last_push`   | Last push timestamp          | `2024-01-15T10:30:00Z`   |
+| `last_pull`   | Last pull timestamp          | `2024-01-15T09:15:00Z`   |
+| `version`     | Current version number       | `5`                      |
+| `variables`   | Key-value pairs              | `{"API_KEY": "value"}`   |
+
+## Common Environment Patterns
+
+### Standard Environments
+
+Most projects use these standard environments:
+
+```bash
+# Development - for local development
+.env.development
+
+# Staging - for testing before production
+.env.staging
+
+# Production - for live application
+.env.production
+```
+
+### Specialized Environments
+
+You can create environments for specific use cases:
+
+```bash
+# Testing - for automated tests
+.env.test
+
+# Demo - for demonstrations
+.env.demo
+
+# Feature branches
+.env.feature-auth
+
+# Regional deployments
+.env.production-us-east
+.env.production-eu-west
+```
+
+## Environment Variables
+
+### Variable Types
+
+<Grid cols={2}>
+  <Card title="Configuration">
+    ```bash NODE_ENV=production PORT=3000 LOG_LEVEL=error ``` Application
+    configuration
+  </Card>
+  <Card title="Secrets">
+    ```bash API_KEY=sk_live_123456 DATABASE_PASSWORD=secret123
+    JWT_SECRET=super_secret_key ``` Sensitive credentials
+  </Card>
+  <Card title="External Services">
+    ```bash DATABASE_URL=postgresql://... REDIS_URL=redis://...
+    AWS_REGION=us-east-1 ``` Third-party service URLs
+  </Card>
+  <Card title="Feature Flags">
+    ```bash ENABLE_BETA_FEATURES=true MAINTENANCE_MODE=false DEBUG_ENABLED=false
+    ``` Feature toggles
+  </Card>
+</Grid>
+
+### Variable Naming Conventions
+
+Follow these conventions for consistency:
+
+```bash
+# Use UPPER_CASE for environment variables
+DATABASE_URL=postgresql://...
+API_KEY=your_api_key_here
+
+# Use descriptive names
+REDIS_CACHE_URL=redis://cache:6379
+REDIS_SESSION_URL=redis://sessions:6379
+
+# Use prefixes for related variables
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=us-east-1
+
+# Use suffixes for environment-specific values
+DATABASE_URL_DEV=postgresql://localhost:5432/dev
+DATABASE_URL_PROD=postgresql://prod-db:5432/prod
+```
+
+## Environment Lifecycle
+
+### Creating Environments
+
+```bash
+# Initialize with default environments
+envfly init
+
+# Create custom environment
+envfly env create testing
+
+# Create environment with description
+envfly env create demo --description "Demo environment for presentations"
+```
+
+### Managing Environments
+
+```bash
+# List all environments
+envfly list
+
+# Show environment details
+envfly env show production
+
+# Update environment description
+envfly env update production --description "Updated description"
+
+# Delete environment
+envfly env delete testing
+```
+
+### Syncing Environments
+
+```bash
+# Push local changes to remote
+envfly push production
+
+# Pull remote changes to local
+envfly pull staging
+
+# Sync (merge local and remote)
+envfly sync development
+```
+
+## Environment Versioning
+
+### Version History
+
+Each environment maintains a version history:
+
+```bash
+# View version history
+envfly history production
+
+# Output:
+# Version 5 - 2024-01-15 10:30:00 (alice@company.com)
+#   + Added REDIS_URL
+#   - Removed OLD_API_KEY
+#   ~ Updated DATABASE_URL
+#
+# Version 4 - 2024-01-14 15:45:00 (bob@company.com)
+#   + Added LOG_LEVEL
+```
+
+### Rollback
+
+You can rollback to previous versions:
+
+```bash
+# Rollback to specific version
+envfly rollback production v3
+
+# Rollback to previous version
+envfly rollback production --previous
+```
+
+## Environment Security
+
+### Access Control
+
+Environments can have different access levels:
+
+```bash
+# Grant read-only access
+envfly team grant alice@company.com production readonly
+
+# Grant read-write access
+envfly team grant bob@company.com staging readwrite
+
+# Grant admin access
+envfly team grant admin@company.com production admin
+```
+
+### Encryption
+
+All environment variables are encrypted:
+
+```bash
+# Variables are encrypted before storage
+DATABASE_PASSWORD=secret123  # Stored as encrypted data
+API_KEY=sk_live_123456       # Stored as encrypted data
+
+# Only you can decrypt with your key
+```
+
+## Environment Best Practices
+
+### Organization
+
+<AccordionGroup>
+  <Accordion title="Use Descriptive Names">
+    ```bash # Good .env.production-us-east .env.staging-testing # Avoid
+    .env.env1 .env.prod ```
+  </Accordion>
+  <Accordion title="Group Related Variables">
+    ```bash # Database variables DATABASE_URL=... DATABASE_POOL_SIZE=10 # API
+    variables API_BASE_URL=... API_TIMEOUT=5000 # Feature flags ENABLE_BETA=true
+    MAINTENANCE_MODE=false ```
+  </Accordion>
+  <Accordion title="Use Consistent Naming">
+    ```bash # Use the same variable names across environments DATABASE_URL=... #
+    Same name, different values API_KEY=... # Same name, different values
+    LOG_LEVEL=... # Same name, different values ```
+  </Accordion>
+</AccordionGroup>
+
+### Security
+
+<AccordionGroup>
+  <Accordion title="Never Commit Secrets">
+    ```bash # Add to .gitignore .env* !.env.example ```
+  </Accordion>
+  <Accordion title="Use Different Secrets">
+    ```bash # Each environment should have unique secrets
+    API_KEY_DEV=dev_key_123 API_KEY_STAGING=staging_key_456
+    API_KEY_PROD=prod_key_789 ```
+  </Accordion>
+  <Accordion title="Rotate Secrets Regularly">
+    ```bash # Update secrets periodically envfly push production # After
+    updating secrets envfly team notify production # Notify team members ```
+  </Accordion>
+</AccordionGroup>
+
+## Environment Templates
+
+### Creating Templates
+
+You can create environment templates for consistency:
+
+```bash
+# Create template
+envfly template create nodejs-app
+
+# Add variables to template
+envfly template add nodejs-app NODE_ENV
+envfly template add nodejs-app PORT
+envfly template add nodejs-app DATABASE_URL
+```
+
+### Using Templates
+
+```bash
+# Create environment from template
+envfly env create production --template nodejs-app
+
+# Apply template to existing environment
+envfly env apply-template production nodejs-app
+```
+
+## Environment Validation
+
+### Schema Validation
+
+Define schemas for environment validation:
+
+```json
+{
+  "required": ["DATABASE_URL", "API_KEY"],
+  "properties": {
+    "DATABASE_URL": {
+      "type": "string",
+      "pattern": "^postgresql://"
+    },
+    "PORT": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 65535
+    }
+  }
+}
+```
+
+### Validation Commands
+
+```bash
+# Validate environment
+envfly validate production
+
+# Validate all environments
+envfly validate --all
+
+# Fix validation issues
+envfly validate production --fix
+```
+
+## Next Steps
+
+Now that you understand environments:
+
+1. **Create your first environment**: `envfly init`
+2. **Learn about storage providers**: [Storage Providers](/concepts/storage-providers)
+3. **Set up team collaboration**: [Teams](/concepts/teams)
+4. **Explore security features**: [Security](/concepts/security)
+
+<Callout type="info">
+  Environments are the foundation of EnvFly CLI. They help you manage different
+  configurations for your application across development, staging, and
+  production.
+</Callout>{" "}

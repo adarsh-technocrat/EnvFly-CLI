@@ -1,0 +1,300 @@
+---
+title: "Security"
+description: "Security features and best practices for EnvFly CLI"
+---
+
+# Security
+
+EnvFly CLI is built with security as a top priority. This page explains the security features and best practices for keeping your environment variables safe.
+
+## Encryption
+
+### Client-Side Encryption
+
+All environment variables are encrypted **before** they leave your machine. EnvFly CLI uses industry-standard encryption to ensure your secrets remain private.
+
+<Grid cols={2}>
+  <Card title="Encryption Algorithm">
+    **AES-256-GCM** - 256-bit Advanced Encryption Standard - Galois/Counter Mode
+    for authenticated encryption - Provides both confidentiality and integrity
+  </Card>
+  <Card title="Key Derivation">
+    **PBKDF2** - Password-Based Key Derivation Function 2 - 100,000 iterations
+    for key stretching - Salted to prevent rainbow table attacks
+  </Card>
+</Grid>
+
+### Zero-Knowledge Architecture
+
+EnvFly CLI follows a zero-knowledge approach:
+
+<Mermaid>
+  graph LR A[Your Machine] --> B[Encrypt with your key] B --> C[Encrypted data]
+  C --> D[Storage Provider] D --> E[Server never sees plaintext]
+</Mermaid>
+
+- **Your encryption key never leaves your machine**
+- **Storage providers only see encrypted data**
+- **Even EnvFly servers cannot decrypt your secrets**
+- **You control access to your data**
+
+## Key Management
+
+### Encryption Key Storage
+
+For different storage providers, keys are managed differently:
+
+#### Git Repository
+
+```bash
+# You provide the encryption key during init
+Enter encryption key for Git storage: ********
+```
+
+**Security Considerations:**
+
+- Store your encryption key securely
+- Consider using a password manager
+- Never commit the key to version control
+- Share the key securely with team members
+
+#### Cloud Providers (AWS, Azure, GCP)
+
+```bash
+# Keys are managed by the cloud provider
+# EnvFly CLI uses your cloud credentials
+aws configure
+az login
+gcloud auth application-default login
+```
+
+**Security Benefits:**
+
+- Leverages cloud provider security
+- IAM/role-based access control
+- Automatic key rotation
+- Audit logging
+
+#### EnvFly Cloud Service
+
+```bash
+# API keys are stored securely using keytar
+envfly login
+```
+
+**Security Features:**
+
+- API keys stored in system keychain
+- Automatic key validation
+- Secure token refresh
+
+## Access Control
+
+### Role-Based Permissions
+
+When using EnvFly Cloud Service, you can assign different roles to team members:
+
+<Grid cols={3}>
+  <Card title="Admin">
+    - Full access to all environments - Team management - Audit logs -
+    Configuration changes
+  </Card>
+  <Card title="Developer">
+    - Read/write access to assigned environments - Can push and pull
+    environments - View environment history
+  </Card>
+  <Card title="Readonly">
+    - Read-only access to assigned environments - Can pull environments - View
+    environment history - No modification rights
+  </Card>
+</Grid>
+
+### Environment-Level Access
+
+Granular permissions per environment:
+
+```bash
+# Grant specific access to an environment
+envfly team grant alice@company.com production readwrite
+
+# Grant read-only access
+envfly team grant bob@company.com staging readonly
+
+# Grant access to specific variables only
+envfly team grant charlie@company.com production readonly --keys API_KEY,DATABASE_URL
+```
+
+### Cross-Team Sharing
+
+Share environments between teams with controlled access:
+
+```bash
+# Share environment with another team
+envfly team share-env production frontend-team
+
+# Grant specific permissions to shared environment
+envfly team grant frontend-team production readonly
+```
+
+## Audit Logging
+
+### Comprehensive Audit Trail
+
+All actions are logged for security and compliance:
+
+```bash
+# View audit logs for an environment
+envfly audit production
+```
+
+**Logged Events:**
+
+- Environment pushes and pulls
+- Team member invitations
+- Permission changes
+- Access attempts
+- Configuration modifications
+
+### Audit Log Details
+
+Each audit entry includes:
+
+```json
+{
+  "timestamp": "2024-01-15T10:30:00Z",
+  "user": "alice@company.com",
+  "action": "environment.push",
+  "environment": "production",
+  "ip_address": "192.168.1.100",
+  "user_agent": "envfly-cli/1.0.0",
+  "details": {
+    "variables_modified": 3,
+    "variables_added": 1,
+    "variables_removed": 0
+  }
+}
+```
+
+## Best Practices
+
+### Encryption Key Management
+
+<AccordionGroup>
+  <Accordion title="Use Strong Keys">
+    Generate strong, random encryption keys: ```bash # Generate a strong key
+    openssl rand -base64 32 ```
+  </Accordion>
+  <Accordion title="Secure Key Storage">
+    Store encryption keys securely: - Use a password manager - Never store in
+    plain text files - Don't commit to version control - Share securely with
+    team members
+  </Accordion>
+  <Accordion title="Regular Key Rotation">
+    Rotate encryption keys periodically: - Generate new keys every 6-12 months -
+    Re-encrypt all environments with new keys - Update team members with new
+    keys
+  </Accordion>
+</AccordionGroup>
+
+### Access Control
+
+<AccordionGroup>
+  <Accordion title="Principle of Least Privilege">
+    Grant only necessary permissions: - Start with read-only access - Escalate
+    permissions as needed - Regularly review and revoke unused access
+  </Accordion>
+  <Accordion title="Team Management">
+    Manage team membership carefully: - Remove former employees immediately -
+    Use invite codes for new members - Monitor team access regularly
+  </Accordion>
+  <Accordion title="Environment Isolation">
+    Separate environments by sensitivity: - Production: Restricted access -
+    Staging: Developer access - Development: Open access
+  </Accordion>
+</AccordionGroup>
+
+### Network Security
+
+<AccordionGroup>
+  <Accordion title="Use HTTPS">
+    Always use HTTPS for API communication: - EnvFly CLI enforces HTTPS - Verify
+    SSL certificates - Use corporate proxies if required
+  </Accordion>
+  <Accordion title="Network Restrictions">
+    Restrict network access where possible: - Use VPN for remote access -
+    Configure firewall rules - Monitor network traffic
+  </Accordion>
+  <Accordion title="API Rate Limiting">
+    Be aware of rate limits: - Respect API rate limits - Implement exponential
+    backoff - Monitor for unusual activity
+  </Accordion>
+</AccordionGroup>
+
+## Compliance
+
+### Security Standards
+
+EnvFly CLI helps you meet various compliance requirements:
+
+<Grid cols={2}>
+  <Card title="SOC 2">
+    - Access controls - Audit logging - Data encryption - Change management
+  </Card>
+  <Card title="GDPR">
+    - Data minimization - Access controls - Audit trails - Data portability
+  </Card>
+  <Card title="HIPAA">
+    - Encryption at rest - Access logging - User authentication - Audit controls
+  </Card>
+  <Card title="PCI DSS">
+    - Strong cryptography - Access controls - Audit logging - Security
+    monitoring
+  </Card>
+</Grid>
+
+### Security Features Summary
+
+| Feature                    | Description                 | Benefit                       |
+| -------------------------- | --------------------------- | ----------------------------- |
+| **Client-side encryption** | AES-256-GCM encryption      | Data never leaves unencrypted |
+| **Zero-knowledge**         | Server never sees plaintext | Complete privacy              |
+| **Role-based access**      | Granular permissions        | Controlled access             |
+| **Audit logging**          | Complete activity trail     | Compliance & security         |
+| **Key management**         | Secure key storage          | Key security                  |
+| **Network security**       | HTTPS enforcement           | Secure communication          |
+
+## Security Checklist
+
+Before using EnvFly CLI in production:
+
+- [ ] Generate strong encryption keys
+- [ ] Configure secure key storage
+- [ ] Set up role-based access control
+- [ ] Enable audit logging
+- [ ] Configure network security
+- [ ] Train team on security practices
+- [ ] Set up monitoring and alerting
+- [ ] Create incident response plan
+- [ ] Regular security reviews
+- [ ] Key rotation schedule
+
+<Callout type="warning">
+  Security is a shared responsibility. While EnvFly CLI provides strong security
+  features, you must also follow security best practices in your organization.
+</Callout>
+
+## Reporting Security Issues
+
+If you discover a security vulnerability:
+
+1. **Do not** create a public GitHub issue
+2. **Email** security@envfly.io with details
+3. **Include** steps to reproduce the issue
+4. **Provide** affected versions and platforms
+
+We take security seriously and will respond promptly to all security reports.
+
+<Callout type="info">
+  For additional security guidance, check out our [deployment security
+  guide](/deployment/security) and [compliance documentation](/compliance).
+</Callout>{" "}

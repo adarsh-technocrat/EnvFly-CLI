@@ -1,0 +1,130 @@
+---
+title: "Introduction"
+description: "A lightweight Node.js command-line tool for syncing environment variables across teams and projects"
+---
+
+<Hero
+  title="EnvFly CLI"
+  subtitle="Think of it as 'Git for environment variables' - secure, fast, and team-friendly"
+  image="/hero-image.png"
+  cta={{
+    text: "Get Started",
+    link: "/getting-started",
+  }}
+  secondaryCta={{
+    text: "View on GitHub",
+    link: "https://github.com/adarsh-technocrat/EnvFly-CLI",
+  }}
+/>
+
+<Grid cols={3}>
+  <Card title="🔐 Secure Storage" href="/concepts/security">
+    Client-side encryption with AES-256-GCM. Your secrets stay private.
+  </Card>
+  <Card title="🌐 Multiple Providers" href="/providers/git">
+    Git, AWS, Azure, Google Cloud, or EnvFly Cloud Service.
+  </Card>
+  <Card title="👥 Team Collaboration" href="/concepts/teams">
+    Share environments with role-based access control.
+  </Card>
+</Grid>
+
+## What is EnvFly CLI?
+
+EnvFly CLI is a powerful command-line tool designed to solve the common problem of managing environment variables across development teams. It provides a secure, version-controlled way to sync environment variables between team members and different deployment environments.
+
+### Key Features
+
+<Grid cols={2}>
+  <div>
+    <h3>🔐 Security First</h3>
+    <ul>
+      <li>Client-side encryption with AES-256-GCM</li>
+      <li>Zero-knowledge architecture</li>
+      <li>Secure key derivation with PBKDF2</li>
+      <li>Role-based access control</li>
+    </ul>
+  </div>
+  <div>
+    <h3>🚀 Easy to Use</h3>
+    <ul>
+      <li>Simple CLI commands</li>
+      <li>Git-like workflow</li>
+      <li>Automatic conflict resolution</li>
+      <li>Cross-platform support</li>
+    </ul>
+  </div>
+</Grid>
+
+## Why EnvFly CLI?
+
+### The Problem
+
+Managing environment variables across teams is challenging:
+
+- **Security**: Sharing secrets via Slack, email, or docs is risky
+- **Version Control**: No history of changes or rollback capability
+- **Team Coordination**: Hard to keep everyone in sync
+- **Deployment**: Manual copying between environments is error-prone
+
+### The Solution
+
+EnvFly CLI provides:
+
+- **Secure Storage**: Encrypted storage with multiple provider options
+- **Version Control**: Full history and rollback capabilities
+- **Team Sync**: Automatic synchronization across team members
+- **Deployment Ready**: Easy integration with CI/CD pipelines
+
+## Quick Start
+
+```bash
+# Install EnvFly CLI
+npm install -g envfly-cli
+
+# Initialize in your project
+envfly init
+
+# Push your environment variables
+envfly push production
+
+# Share with your team
+envfly team invite alice@company.com
+```
+
+<Callout type="info">
+  Ready to get started? Check out our [installation guide](/installation) or
+  jump straight to [getting started](/getting-started).
+</Callout>
+
+## Architecture
+
+<Mermaid>
+  graph TD A[Developer] --> B[EnvFly CLI] B --> C[Storage Provider] C --> D[Git
+  Repository] C --> E[AWS Secrets Manager] C --> F[Azure Key Vault] C -->
+  G[Google Secret Manager] C --> H[EnvFly Cloud] B --> I[Encryption Layer] I -->
+  J[AES-256-GCM] B --> K[Team Management] K --> L[Role-based Access] K -->
+  M[Audit Logs]
+</Mermaid>
+
+## Supported Platforms
+
+<Grid cols={3}>
+  <Card title="Operating Systems">- macOS - Linux - Windows</Card>
+  <Card title="Node.js Versions">
+    - Node.js 14+ - Node.js 16+ - Node.js 18+ - Node.js 20+
+  </Card>
+  <Card title="Package Managers">- npm - yarn - pnpm</Card>
+</Grid>
+
+## Community & Support
+
+- **GitHub**: [adarsh-technocrat/EnvFly-CLI](https://github.com/adarsh-technocrat/EnvFly-CLI)
+- **Discord**: [Join our community](https://discord.gg/envfly)
+- **Issues**: [Report bugs](https://github.com/adarsh-technocrat/EnvFly-CLI/issues)
+- **Discussions**: [Ask questions](https://github.com/adarsh-technocrat/EnvFly-CLI/discussions)
+
+<Callout type="warning">
+  This project is actively maintained. For the latest updates, check our
+  [changelog](https://github.com/adarsh-technocrat/EnvFly-CLI/blob/main/CHANGELOG.md).
+</Callout>{" "}

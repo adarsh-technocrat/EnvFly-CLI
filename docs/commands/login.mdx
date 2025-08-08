@@ -1,0 +1,234 @@
+---
+title: "envfly login"
+description: "Authenticate with EnvFly Cloud Service"
+---
+
+# envfly login
+
+Authenticate with EnvFly Cloud Service to access team features and cloud storage.
+
+## Usage
+
+```bash
+envfly login
+```
+
+## Description
+
+The `login` command authenticates you with the EnvFly Cloud Service. This is required for:
+
+- Using EnvFly Cloud Service as a storage provider
+- Team management features
+- Cross-team environment sharing
+- Audit logs and analytics
+
+## Authentication Methods
+
+### API Key Authentication (Recommended)
+
+```bash
+$ envfly login
+API Key: ********
+```
+
+You'll be prompted to enter your API key. The key will be stored securely in your system's keychain.
+
+### Getting Your API Key
+
+1. **Sign up** at [app.envfly.io](https://app.envfly.io)
+2. **Navigate** to your profile settings
+3. **Generate** a new API key
+4. **Copy** the key and use it with the login command
+
+<Callout type="warning">
+  API keys are sensitive credentials. Never share them or commit them to version
+  control.
+</Callout>
+
+## Secure Storage
+
+Your API key is stored securely using your system's keychain:
+
+- **macOS**: Keychain Access
+- **Linux**: Secret Service API (GNOME Keyring/KWallet)
+- **Windows**: Windows Credential Manager
+
+## Verification
+
+After login, verify your authentication:
+
+```bash
+# Check authentication status
+envfly auth status
+
+# Test API connection
+envfly list
+```
+
+## Logout
+
+To log out and remove stored credentials:
+
+```bash
+envfly logout
+```
+
+This will remove your API key from the system keychain.
+
+## Examples
+
+### Basic Login
+
+```bash
+$ envfly login
+Welcome to EnvFly Cloud Service!
+
+Please enter your API key to authenticate.
+You can find your API key at: https://app.envfly.io/settings/api-keys
+
+API Key: ********
+✅ Authentication successful!
+
+You are now logged in as: alice@company.com
+Team: Backend Team
+Role: Admin
+```
+
+### Login with Environment Variable
+
+You can also provide the API key via environment variable:
+
+```bash
+# Set environment variable
+export ENVFLY_API_KEY="your-api-key-here"
+
+# Login (will use environment variable)
+envfly login
+```
+
+### Login for CI/CD
+
+For automated environments, use environment variables:
+
+```bash
+# In your CI/CD pipeline
+export ENVFLY_API_KEY="${{ secrets.ENVFLY_API_KEY }}"
+envfly login
+envfly pull production
+```
+
+## Error Handling
+
+### Invalid API Key
+
+```bash
+$ envfly login
+API Key: ********
+❌ Authentication failed: Invalid API key
+
+Please check your API key and try again.
+You can generate a new key at: https://app.envfly.io/settings/api-keys
+```
+
+### Network Issues
+
+```bash
+$ envfly login
+API Key: ********
+❌ Authentication failed: Could not connect to EnvFly server
+
+Please check your internet connection and try again.
+```
+
+### Keychain Issues
+
+```bash
+$ envfly login
+API Key: ********
+⚠️  Warning: Could not store API key securely
+
+The API key will be stored in memory only and will be lost when you close your terminal.
+```
+
+## Configuration
+
+### Custom API Endpoint
+
+If you're using a self-hosted EnvFly instance:
+
+```bash
+# Set custom endpoint
+export ENVFLY_API_ENDPOINT="https://your-envfly-instance.com/api/v1"
+
+# Login
+envfly login
+```
+
+### Debug Mode
+
+For troubleshooting authentication issues:
+
+```bash
+# Enable debug mode
+export DEBUG=envfly:auth
+
+# Login with debug output
+envfly login
+```
+
+## Security Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Environment Variables">
+    For CI/CD and automation: ```bash export ENVFLY_API_KEY="your-key" envfly
+    login ```
+  </Accordion>
+  <Accordion title="Rotate API Keys Regularly">
+    - Generate new keys every 90 days - Revoke old keys immediately - Use
+    different keys for different environments
+  </Accordion>
+  <Accordion title="Limit Key Permissions">
+    - Use read-only keys for CI/CD - Use admin keys only for management tasks -
+    Create team-specific keys when possible
+  </Accordion>
+  <Accordion title="Monitor Key Usage">
+    - Check API key usage in your dashboard - Set up alerts for unusual activity
+    - Review access logs regularly
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Keychain Access Denied">
+    **Error**: `Could not store API key securely` **Solution**: Grant keychain
+    access to your terminal: ```bash # On macOS, you'll be prompted to allow
+    access # On Linux, ensure keyring is unlocked gnome-keyring-daemon --unlock
+    ```
+  </Accordion>
+  <Accordion title="API Key Not Found">
+    **Error**: `API key not found in keychain` **Solution**: Re-authenticate:
+    ```bash envfly logout envfly login ```
+  </Accordion>
+  <Accordion title="Network Timeout">
+    **Error**: `Request timed out` **Solution**: Check network and try again:
+    ```bash # Test connectivity curl https://api.envfly.io/health # Try with
+    longer timeout export ENVFLY_TIMEOUT=30000 envfly login ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+After successful login:
+
+1. **Initialize a project**: `envfly init`
+2. **Create a team**: `envfly team create "My Team"`
+3. **Invite members**: `envfly team invite alice@company.com`
+4. **Manage environments**: `envfly list`
+
+<Callout type="info">
+  Once logged in, you can use all EnvFly Cloud Service features including team
+  management and cross-team sharing.
+</Callout>{" "}

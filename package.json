@@ -1,0 +1,36 @@
+{
+  "name": "envfly-cli",
+  "version": "1.0.0",
+  "description": "Lightweight CLI for syncing environment variables across teams",
+  "main": "src/index.js",
+  "bin": {
+    "envfly": "./bin/envfly.js"
+  },
+  "scripts": {
+    "dev": "node bin/envfly.js",
+    "test": "jest",
+    "build": "npm pack",
+    "publish-local": "npm pack && npm install -g envfly-cli-1.0.0.tgz"
+  },
+  "keywords": ["cli", "environment", "variables", "sync", "team", "devops"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.6",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "fs-extra": "^11.2.0",
+    "keytar": "^7.9.0",
+    "listr2": "^8.0.0",
+    "ora": "^5.4.1",
+    "boxen": "^5.1.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

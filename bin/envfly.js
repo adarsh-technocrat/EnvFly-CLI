@@ -11,6 +11,9 @@ const syncCmd = require('../src/commands/sync');
 const pushCmd = require('../src/commands/push');
 const pullCmd = require('../src/commands/pull');
 const listCmd = require('../src/commands/list');
+const teamCmd = require('../src/commands/team');
+const historyCmd = require('../src/commands/history');
+const auditCmd = require('../src/commands/audit');
 
 program
   .name('envfly')
@@ -50,6 +53,23 @@ program
   .description('List available environments')
   .alias('ls')
   .action(listCmd);
+
+// Team management commands
+program
+  .command('team')
+  .description('Team management commands')
+  .action(teamCmd);
+
+// History and audit commands
+program
+  .command('history <environment>')
+  .description('Show environment version history')
+  .action(historyCmd);
+
+program
+  .command('audit <environment>')
+  .description('Show environment audit logs')
+  .action(auditCmd);
 
 // Parse arguments
 program.parse(); 

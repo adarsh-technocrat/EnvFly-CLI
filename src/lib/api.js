@@ -139,6 +139,98 @@ class ApiClient {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  // ===== TEAM MANAGEMENT ENDPOINTS =====
+
+  /**
+   * Create new team
+   */
+  async createTeam(teamData) {
+    return await this.request({
+      method: 'POST',
+      url: '/teams',
+      data: teamData
+    });
+  }
+
+  /**
+   * Get user's teams
+   */
+  async getUserTeams() {
+    return await this.request({
+      method: 'GET',
+      url: '/teams'
+    });
+  }
+
+  /**
+   * Get team details
+   */
+  async getTeam(teamId) {
+    return await this.request({
+      method: 'GET',
+      url: `/teams/${teamId}`
+    });
+  }
+
+  /**
+   * Get team members
+   */
+  async getTeamMembers(teamId) {
+    return await this.request({
+      method: 'GET',
+      url: `/teams/${teamId}/members`
+    });
+  }
+
+  /**
+   * Invite member to team
+   */
+  async inviteTeamMember(inviteData) {
+    return await this.request({
+      method: 'POST',
+      url: `/teams/${inviteData.team_id}/invite`,
+      data: {
+        email: inviteData.email,
+        role: inviteData.role
+      }
+    });
+  }
+
+  /**
+   * Join team via invite code
+   */
+  async joinTeam(joinData) {
+    return await this.request({
+      method: 'POST',
+      url: '/teams/join',
+      data: joinData
+    });
+  }
+
+  /**
+   * Grant environment access to user
+   */
+  async grantEnvironmentAccess(permissionData) {
+    return await this.request({
+      method: 'POST',
+      url: '/environments/access',
+      data: permissionData
+    });
+  }
+
+  /**
+   * Share environment with team
+   */
+  async shareEnvironment(shareData) {
+    return await this.request({
+      method: 'POST',
+      url: '/environments/share',
+      data: shareData
+    });
+  }
+
+  // ===== EXISTING ENVIRONMENT ENDPOINTS =====
+
   /**
    * Get environments for project
    */
@@ -233,16 +325,6 @@ class ApiClient {
   }
 
   /**
-   * Get team information
-   */
-  async getTeam(teamId) {
-    return await this.request({
-      method: 'GET',
-      url: `/teams/${teamId}`
-    });
-  }
-
-  /**
    * Upload environment file
    */
   async uploadEnvironmentFile(projectId, environmentId, fileContent) {
@@ -273,6 +355,27 @@ class ApiClient {
     return await this.request({
       method: 'GET',
       url: `/projects/${projectId}/environments/${environmentId}/history`
+    });
+  }
+
+  /**
+   * Get environment audit logs
+   */
+  async getEnvironmentAudit(projectId, environmentId) {
+    return await this.request({
+      method: 'GET',
+      url: `/projects/${projectId}/environments/${environmentId}/audit`
+    });
+  }
+
+  /**
+   * Rollback environment to specific version
+   */
+  async rollbackEnvironment(projectId, environmentId, version) {
+    return await this.request({
+      method: 'POST',
+      url: `/projects/${projectId}/environments/${environmentId}/rollback`,
+      data: { version }
     });
   }
 

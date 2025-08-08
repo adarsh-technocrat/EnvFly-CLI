@@ -2,6 +2,7 @@ const chalk = require('chalk');
 const { configManager } = require('../lib/config');
 const { authManager } = require('../lib/auth');
 const { apiClient } = require('../lib/api');
+const { StorageProviderFactory } = require('../lib/storage-providers');
 const { envParser } = require('../lib/env-parser');
 const { cryptoManager } = require('../lib/crypto');
 const { showSuccess, showError, showInfo, createSpinner, formatDate } = require('../lib/utils');
@@ -11,19 +12,6 @@ async function push(environment) {
     // Load configuration
     const config = await configManager.loadConfig();
     
-    // Check authentication
-    const isAuthenticated = await authManager.checkAuth();
-    if (!isAuthenticated) {
-      showError(
-        'You are not authenticated. Please run "envfly login" first.',
-        'Authentication Required'
-      );
-      process.exit(1);
-    }
-
-    // Initialize API client
-    await apiClient.initialize();
-
     // Validate environment name
     if (!environment) {
       showError(
@@ -44,7 +32,16 @@ async function push(environment) {
       process.exit(1);
     }
 
-    await pushEnvironment(environment, envConfig, config);
+    // Get storage provider
+    const storageProvider = config.storage?.provider || 'envfly';
+    
+    if (storageProvider === 'envfly') {
+      // Use EnvFly cloud service
+      await pushToEnvFly(environment, envConfig, config);
+    } else {
+      // Use custom storage provider
+      await pushToStorageProvider(environment, envConfig, config);
+    }
 
   } catch (error) {
     showError(
@@ -56,15 +53,28 @@ async function push(environment) {
 }
 
 /**
- * Push environment to remote
+ * Push to EnvFly cloud service
  */
-async function pushEnvironment(envName, envConfig, config) {
-  const spinner = createSpinner(`Pushing ${envName} environment...`);
+async function pushToEnvFly(environment, envConfig, config) {
+  // Check authentication
+  const isAuthenticated = await authManager.checkAuth();
+  if (!isAuthenticated) {
+    showError(
+      'You are not authenticated. Please run "envfly login" first.',
+      'Authentication Required'
+    );
+    process.exit(1);
+  }
+
+  // Initialize API client
+  await apiClient.initialize();
+
+  const spinner = createSpinner(`Pushing ${environment} environment...`);
   spinner.start();
 
   try {
     // Get local environment file path
-    const localFilePath = envParser.getEnvFilePath(envName, config);
+    const localFilePath = envParser.getEnvFilePath(environment, config);
     
     // Read local environment
     let localEnv;
@@ -107,8 +117,8 @@ async function pushEnvironment(envName, envConfig, config) {
     } else {
       // Create new environment
       const newEnvData = {
-        name: envName,
-        description: envConfig.description || `${envName} environment`,
+        name: environment,
+        description: envConfig.description || `${environment} environment`,
         variables: encryptedData,
         encrypted: cryptoManager.isEncryptionEnabled(config)
       };
@@ -127,10 +137,10 @@ async function pushEnvironment(envName, envConfig, config) {
     envConfig.last_push = new Date().toISOString();
     await configManager.saveConfig(config);
 
-    spinner.succeed(`Successfully pushed ${envName} environment`);
+    spinner.succeed(`Successfully pushed ${environment} environment`);
 
     showSuccess(
-      `Environment ${chalk.bold(envName)} pushed successfully!\n\n` +
+      `Environment ${chalk.bold(environment)} pushed successfully!\n\n` +
       `Local file: ${chalk.bold(envConfig.file)}\n` +
       `Remote ID: ${chalk.bold(remoteId)}\n` +
       `Variables: ${chalk.bold(Object.keys(localEnv).length)}\n` +
@@ -140,7 +150,65 @@ async function pushEnvironment(envName, envConfig, config) {
     );
 
   } catch (error) {
-    spinner.fail(`Failed to push ${envName}`);
+    spinner.fail(`Failed to push ${environment}`);
+    throw error;
+  }
+}
+
+/**
+ * Push to custom storage provider
+ */
+async function pushToStorageProvider(environment, envConfig, config) {
+  const spinner = createSpinner(`Pushing ${environment} to ${config.storage.provider}...`);
+  spinner.start();
+
+  try {
+    // Get local environment file path
+    const localFilePath = envParser.getEnvFilePath(environment, config);
+    
+    // Read local environment
+    let localEnv;
+    try {
+      localEnv = await envParser.readEnvFile(localFilePath);
+    } catch (error) {
+      spinner.fail(`Local environment file not found: ${envConfig.file}`);
+      throw new Error(`Local environment file not found: ${envConfig.file}`);
+    }
+
+    // Validate environment
+    const validation = envParser.validateEnvironment(localEnv);
+    if (!validation.valid) {
+      spinner.fail('Environment validation failed');
+      console.log(chalk.red('Validation errors:'));
+      validation.errors.forEach(error => console.log(chalk.red(`  • ${error}`)));
+      throw new Error('Environment validation failed');
+    }
+
+    spinner.text = 'Storing environment variables...';
+
+    // Create storage provider
+    const provider = await StorageProviderFactory.create(config.storage.provider, config.storage.config);
+    
+    // Store environment variables
+    const metadata = await provider.store(environment, localEnv);
+
+    // Update last push time
+    envConfig.last_push = new Date().toISOString();
+    await configManager.saveConfig(config);
+
+    spinner.succeed(`Successfully pushed ${environment} environment`);
+
+    showSuccess(
+      `Environment ${chalk.bold(environment)} pushed successfully!\n\n` +
+      `Local file: ${chalk.bold(envConfig.file)}\n` +
+      `Storage: ${chalk.bold(config.storage.provider)}\n` +
+      `Variables: ${chalk.bold(Object.keys(localEnv).length)}\n` +
+      `Last push: ${chalk.bold(formatDate(envConfig.last_push))}`,
+      'Push Complete'
+    );
+
+  } catch (error) {
+    spinner.fail(`Failed to push ${environment}`);
     throw error;
   }
 }

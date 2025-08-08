@@ -1,0 +1,596 @@
+---
+title: "Node.js Project"
+description: "Complete guide for using EnvFly CLI with Node.js applications"
+---
+
+# Node.js Project Integration
+
+Learn how to integrate EnvFly CLI with your Node.js applications for secure environment variable management.
+
+## Overview
+
+This guide covers integrating EnvFly CLI with Node.js applications, including Express.js, Fastify, and other popular frameworks. You'll learn how to:
+
+- Set up environment variables for different stages
+- Integrate with popular Node.js frameworks
+- Handle environment-specific configurations
+- Implement secure practices for production
+
+## Project Structure
+
+```
+my-nodejs-app/
+├── .envfly                 # EnvFly configuration
+├── .env                    # Local environment (gitignored)
+├── .env.example           # Example environment template
+├── package.json
+├── src/
+│   ├── config/
+│   │   └── database.js    # Database configuration
+│   ├── routes/
+│   │   └── api.js         # API routes
+│   ├── middleware/
+│   │   └── auth.js        # Authentication middleware
+│   └── app.js             # Main application
+├── scripts/
+│   └── setup-env.sh       # Environment setup script
+└── README.md
+```
+
+## Initial Setup
+
+### 1. Install EnvFly CLI
+
+```bash
+# Install globally
+npm install -g envfly-cli
+
+# Or use npx
+npx envfly-cli init
+```
+
+### 2. Initialize EnvFly in Your Project
+
+```bash
+cd my-nodejs-app
+envfly init
+```
+
+Choose your storage provider and configure the project:
+
+```bash
+$ envfly init
+? Project name: my-nodejs-app
+? Storage provider: git
+? Git repository: git@github.com:company/my-nodejs-app-env.git
+? Branch: main
+? Enable encryption? Yes
+? Enable audit logs? Yes
+
+✅ Project initialized successfully!
+```
+
+### 3. Set Up Environment Variables
+
+```bash
+# Development environment
+envfly push development NODE_ENV="development"
+envfly push development PORT="3000"
+envfly push development DATABASE_URL="postgresql://localhost:5432/dev"
+envfly push development JWT_SECRET="dev-secret-key"
+envfly push development REDIS_URL="redis://localhost:6379"
+envfly push development LOG_LEVEL="debug"
+
+# Staging environment
+envfly push staging NODE_ENV="staging"
+envfly push staging PORT="3000"
+envfly push staging DATABASE_URL="postgresql://staging:5432/staging"
+envfly push staging JWT_SECRET="staging-secret-key"
+envfly push staging REDIS_URL="redis://staging:6379"
+envfly push staging LOG_LEVEL="info"
+
+# Production environment
+envfly push production NODE_ENV="production"
+envfly push production PORT="3000"
+envfly push production DATABASE_URL="postgresql://prod:5432/production"
+envfly push production JWT_SECRET="prod-secret-key"
+envfly push production REDIS_URL="redis://prod:6379"
+envfly push production LOG_LEVEL="warn"
+```
+
+## Framework Integration
+
+### Express.js Integration
+
+```javascript
+// src/app.js
+const express = require("express");
+const dotenv = require("dotenv");
+const helmet = require("helmet");
+const cors = require("cors");
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+
+// Security middleware
+app.use(helmet());
+app.use(cors());
+
+// Body parsing middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use("/api", require("./routes/api"));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
+const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || "development";
+
+app.listen(PORT, () => {
+  console.log(`Server running in ${NODE_ENV} mode on port ${PORT}`);
+});
+
+module.exports = app;
+```
+
+### Database Configuration
+
+```javascript
+// src/config/database.js
+const { Pool } = require("pg");
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+// Test the connection
+pool.on("connect", () => {
+  console.log("Connected to database");
+});
+
+pool.on("error", (err) => {
+  console.error("Database connection error:", err);
+});
+
+module.exports = pool;
+```
+
+### Authentication Middleware
+
+```javascript
+// src/middleware/auth.js
+const jwt = require("jsonwebtoken");
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Access token required" });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid token" });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+module.exports = { authenticateToken };
+```
+
+### API Routes
+
+```javascript
+// src/routes/api.js
+const express = require("express");
+const { authenticateToken } = require("../middleware/auth");
+const pool = require("../config/database");
+
+const router = express.Router();
+
+// Health check endpoint
+router.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Protected route example
+router.get("/users", authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query("SELECT id, name, email FROM users");
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+module.exports = router;
+```
+
+## Environment Management Scripts
+
+### Setup Script
+
+```bash
+#!/bin/bash
+# scripts/setup-env.sh
+
+set -e
+
+echo "Setting up environment for Node.js application..."
+
+# Check if EnvFly CLI is installed
+if ! command -v envfly &> /dev/null; then
+    echo "Installing EnvFly CLI..."
+    npm install -g envfly-cli
+fi
+
+# Pull environment variables
+echo "Pulling environment variables..."
+envfly pull development
+
+# Install dependencies
+echo "Installing dependencies..."
+npm install
+
+# Run database migrations (if applicable)
+if [ -f "migrations/run.js" ]; then
+    echo "Running database migrations..."
+    node migrations/run.js
+fi
+
+echo "Environment setup complete!"
+```
+
+### Development Workflow
+
+```bash
+#!/bin/bash
+# scripts/dev.sh
+
+echo "Starting development environment..."
+
+# Pull latest environment variables
+envfly pull development
+
+# Start the application with nodemon
+npm run dev
+```
+
+### Production Deployment
+
+```bash
+#!/bin/bash
+# scripts/deploy.sh
+
+set -e
+
+echo "Deploying to production..."
+
+# Pull production environment variables
+envfly pull production
+
+# Install production dependencies
+npm ci --only=production
+
+# Run tests
+npm test
+
+# Start the application
+npm start
+```
+
+## Package.json Scripts
+
+```json
+{
+  "name": "my-nodejs-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest",
+    "setup": "./scripts/setup-env.sh",
+    "deploy": "./scripts/deploy.sh",
+    "env:pull": "envfly pull development",
+    "env:push": "envfly push development",
+    "env:list": "envfly list"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "redis": "^4.6.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0"
+  }
+}
+```
+
+## CI/CD Integration
+
+### GitHub Actions
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy Node.js App
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install EnvFly CLI
+        run: npm install -g envfly-cli
+
+      - name: Login to EnvFly
+        run: |
+          echo ${{ secrets.ENVFLY_API_KEY }} | envfly login
+
+      - name: Pull Test Environment
+        run: envfly pull staging
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install EnvFly CLI
+        run: npm install -g envfly-cli
+
+      - name: Login to EnvFly
+        run: |
+          echo ${{ secrets.ENVFLY_API_KEY }} | envfly login
+
+      - name: Pull Production Environment
+        run: envfly pull production
+
+      - name: Install Dependencies
+        run: npm ci --only=production
+
+      - name: Deploy to Production
+        run: |
+          # Your deployment commands here
+          echo "Deploying to production..."
+```
+
+### Docker Integration
+
+```dockerfile
+# Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install EnvFly CLI
+RUN npm install -g envfly-cli
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy application code
+COPY . .
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
+
+# Change ownership
+RUN chown -R nodejs:nodejs /app
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Start application
+CMD ["npm", "start"]
+```
+
+```yaml
+# docker-compose.yml
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+## Security Best Practices
+
+<AccordionGroup>
+  <Accordion title="Environment Variable Security">
+    - Never commit `.env` files to version control - Use different secrets for
+    each environment - Rotate secrets regularly - Use strong, random secrets -
+    Validate environment variables on startup
+  </Accordion>
+
+  <Accordion title="Application Security">
+    - Use HTTPS in production - Implement proper CORS policies - Use security
+    headers (helmet) - Validate all inputs - Implement rate limiting
+  </Accordion>
+
+  <Accordion title="Database Security">
+    - Use connection pooling - Implement proper authentication - Use SSL
+    connections in production - Regular security updates - Backup strategies
+  </Accordion>
+</AccordionGroup>
+
+## Monitoring and Logging
+
+```javascript
+// src/config/logger.js
+const winston = require("winston");
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || "info",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  defaultMeta: { service: "my-nodejs-app" },
+  transports: [
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
+  ],
+});
+
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
+}
+
+module.exports = logger;
+```
+
+## Testing
+
+```javascript
+// tests/app.test.js
+const request = require("supertest");
+const app = require("../src/app");
+
+describe("API Endpoints", () => {
+  test("GET /api/health should return status ok", async () => {
+    const response = await request(app).get("/api/health").expect(200);
+
+    expect(response.body).toHaveProperty("status", "ok");
+    expect(response.body).toHaveProperty("environment");
+  });
+
+  test("GET /api/users should require authentication", async () => {
+    await request(app).get("/api/users").expect(401);
+  });
+});
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Environment Variables Not Loading">
+    **Problem**: `process.env.VARIABLE` is undefined **Solutions**: - Ensure
+    `.env` file exists and is properly formatted - Check that `dotenv.config()`
+    is called early - Verify variable names match exactly - Use `envfly pull` to
+    refresh variables
+  </Accordion>
+
+  <Accordion title="Database Connection Issues">
+    **Problem**: Cannot connect to database **Solutions**: - Verify
+    `DATABASE_URL` is correct - Check database server is running - Ensure SSL
+    settings match environment - Test connection with database client
+  </Accordion>
+
+  <Accordion title="JWT Token Issues">
+    **Problem**: JWT verification fails **Solutions**: - Verify `JWT_SECRET` is
+    set correctly - Check token format and expiration - Ensure secret is
+    consistent across deployments - Use strong, random secrets
+  </Accordion>
+</AccordionGroup>
+
+## Related Examples
+
+<Grid cols={3}>
+  <Card title="React App" href="/examples/react-app">
+    Frontend environment management with React.
+  </Card>
+  <Card title="Microservices" href="/examples/microservices">
+    Managing environments across multiple services.
+  </Card>
+  <Card title="CI/CD Pipeline" href="/examples/ci-cd">
+    Automated deployment with environment variables.
+  </Card>
+</Grid>{" "}

@@ -43,27 +43,101 @@
       "pages": [
         "introduction",
         "getting-started",
-        "installation"
+        "installation",
+        "quick-start"
       ]
     },
     {
       "group": "Core Concepts",
       "pages": [
         "concepts/environments",
-        "concepts/security"
+        "concepts/storage-providers",
+        "concepts/teams",
+        "concepts/security",
+        "concepts/encryption"
       ]
     },
     {
       "group": "Commands",
       "pages": [
         "commands/init",
-        "commands/login"
+        "commands/login",
+        "commands/list",
+        "commands/push",
+        "commands/pull",
+        "commands/sync",
+        "commands/team",
+        "commands/history",
+        "commands/audit",
+        "commands/validate"
+      ]
+    },
+    {
+      "group": "Storage Providers",
+      "pages": [
+        "providers/git",
+        "providers/aws",
+        "providers/azure",
+        "providers/google",
+        "providers/envfly-cloud"
+      ]
+    },
+    {
+      "group": "Configuration",
+      "pages": [
+        "configuration/envfly-file",
+        "configuration/environment-variables",
+        "configuration/encryption",
+        "configuration/teams",
+        "configuration/backup"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api/authentication",
+        "api/teams",
+        "api/environments",
+        "api/projects",
+        "api/webhooks"
       ]
     },
     {
       "group": "Deployment",
       "pages": [
-        "deployment/azure-deployment"
+        "deployment/backend-setup",
+        "deployment/azure-deployment",
+        "deployment/aws-deployment",
+        "deployment/docker",
+        "deployment/kubernetes"
+      ]
+    },
+    {
+      "group": "Examples",
+      "pages": [
+        "examples/nodejs-project",
+        "examples/react-app",
+        "examples/microservices",
+        "examples/ci-cd",
+        "examples/monorepo"
+      ]
+    },
+    {
+      "group": "Best Practices",
+      "pages": [
+        "best-practices/security",
+        "best-practices/team-collaboration",
+        "best-practices/ci-cd",
+        "best-practices/monitoring"
+      ]
+    },
+    {
+      "group": "Troubleshooting",
+      "pages": [
+        "troubleshooting/common-issues",
+        "troubleshooting/error-codes",
+        "troubleshooting/debugging",
+        "troubleshooting/performance"
       ]
     }
   ],

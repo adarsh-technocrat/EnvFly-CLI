@@ -1,0 +1,388 @@
+---
+title: "envfly push"
+description: "Add or update environment variables"
+---
+
+# envfly push
+
+Add or update environment variables in your EnvFly project.
+
+## Usage
+
+```bash
+envfly push <environment> <variable> <value> [options]
+envfly push <environment> --file <file> [options]
+envfly push <environment> --from-env [options]
+```
+
+## Description
+
+The `push` command adds or updates environment variables in a specific environment. Variables are automatically encrypted and stored securely. This command is essential for:
+
+- **Initial Setup**: Adding variables when setting up new environments
+- **Updates**: Modifying existing variables with new values
+- **Bulk Operations**: Importing multiple variables from files
+- **CI/CD**: Automating environment variable management
+
+## Arguments
+
+<AccordionGroup>
+  <Accordion title="environment">
+    **Type**: `string` The target environment (e.g., development, staging,
+    production). ```bash envfly push development
+    DATABASE_URL="postgresql://localhost:5432/dev" envfly push production
+    API_KEY="prod_key_123" ```
+  </Accordion>
+
+  <Accordion title="variable">
+    **Type**: `string` The environment variable name. ```bash envfly push
+    development DATABASE_URL="postgresql://localhost:5432/dev" # ^^^^^^^^^^^
+    ^^^^^^^^^^^^^ # environment variable ```
+  </Accordion>
+
+  <Accordion title="value">
+    **Type**: `string` The environment variable value. ```bash envfly push
+    development DATABASE_URL="postgresql://localhost:5432/dev" #
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ # value ```
+  </Accordion>
+</AccordionGroup>
+
+## Options
+
+<AccordionGroup>
+  <Accordion title="--file, -f">
+    **Type**: `string` Push variables from a file (JSON, YAML, or .env format).
+    ```bash envfly push development --file .env envfly push production -f
+    config.json envfly push staging --file variables.yaml ```
+  </Accordion>
+
+  <Accordion title="--from-env">
+    **Type**: `boolean` Push variables from current shell environment. ```bash
+    export DATABASE_URL="postgresql://localhost:5432/dev" export
+    API_KEY="dev_key_123" envfly push development --from-env ```
+  </Accordion>
+
+  <Accordion title="--encrypt, -e">
+    **Type**: `boolean` **Default**: `true` Force encryption of the variable
+    (even if it appears to be already encrypted). ```bash envfly push production
+    API_KEY="new_key" --encrypt ```
+  </Accordion>
+
+  <Accordion title="--description, -d">
+    **Type**: `string` Add a description for the variable (useful for
+    documentation). ```bash envfly push production
+    DATABASE_URL="postgresql://prod:5432/db" --description "Production
+    PostgreSQL database" ```
+  </Accordion>
+
+  <Accordion title="--force, -F">
+    **Type**: `boolean` **Default**: `false` Overwrite existing variables
+    without confirmation. ```bash envfly push production API_KEY="new_key"
+    --force ```
+  </Accordion>
+
+  <Accordion title="--dry-run">
+    **Type**: `boolean` **Default**: `false` Show what would be pushed without
+    actually pushing. ```bash envfly push production API_KEY="new_key" --dry-run
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Examples
+
+### Basic Push
+
+```bash
+# Add a single variable
+$ envfly push development DATABASE_URL="postgresql://localhost:5432/dev"
+✅ Pushed DATABASE_URL to development environment
+
+# Add multiple variables
+$ envfly push development API_KEY="dev_key_123"
+$ envfly push development DEBUG="true"
+$ envfly push development PORT="3000"
+✅ Pushed API_KEY to development environment
+✅ Pushed DEBUG to development environment
+✅ Pushed PORT to development environment
+```
+
+### Push from File
+
+```bash
+# From .env file
+$ cat .env
+DATABASE_URL=postgresql://localhost:5432/dev
+API_KEY=dev_key_123
+DEBUG=true
+PORT=3000
+
+$ envfly push development --file .env
+✅ Pushed 4 variables to development environment
+```
+
+### Push from JSON
+
+```bash
+# From JSON file
+$ cat config.json
+{
+  "DATABASE_URL": "postgresql://localhost:5432/dev",
+  "API_KEY": "dev_key_123",
+  "DEBUG": true,
+  "PORT": 3000
+}
+
+$ envfly push development --file config.json
+✅ Pushed 4 variables to development environment
+```
+
+### Push from YAML
+
+```bash
+# From YAML file
+$ cat variables.yaml
+DATABASE_URL: postgresql://localhost:5432/dev
+API_KEY: dev_key_123
+DEBUG: true
+PORT: 3000
+
+$ envfly push development --file variables.yaml
+✅ Pushed 4 variables to development environment
+```
+
+### Push from Environment
+
+```bash
+# Set environment variables
+$ export DATABASE_URL="postgresql://localhost:5432/dev"
+$ export API_KEY="dev_key_123"
+$ export DEBUG="true"
+
+# Push from current environment
+$ envfly push development --from-env
+✅ Pushed 3 variables to development environment
+```
+
+### With Descriptions
+
+```bash
+$ envfly push production DATABASE_URL="postgresql://prod:5432/db" --description "Production PostgreSQL database"
+$ envfly push production API_KEY="prod_key_456" --description "Production API key for external services"
+$ envfly push production LOG_LEVEL="info" --description "Production logging level"
+✅ Pushed DATABASE_URL to production environment
+✅ Pushed API_KEY to production environment
+✅ Pushed LOG_LEVEL to production environment
+```
+
+### Dry Run
+
+```bash
+$ envfly push production API_KEY="new_key" --dry-run
+🔍 Dry run - would push:
+  API_KEY: "new_key" (encrypted)
+  Environment: production
+  Description: (none)
+```
+
+### Force Overwrite
+
+```bash
+$ envfly push production API_KEY="new_key" --force
+⚠️  Overwriting existing variable: API_KEY
+✅ Pushed API_KEY to production environment
+```
+
+## File Formats
+
+### .env Format
+
+```bash
+# .env file
+DATABASE_URL=postgresql://localhost:5432/dev
+API_KEY=dev_key_123
+DEBUG=true
+PORT=3000
+NODE_ENV=development
+```
+
+### JSON Format
+
+```json
+{
+  "DATABASE_URL": "postgresql://localhost:5432/dev",
+  "API_KEY": "dev_key_123",
+  "DEBUG": true,
+  "PORT": 3000,
+  "NODE_ENV": "development"
+}
+```
+
+### YAML Format
+
+```yaml
+DATABASE_URL: postgresql://localhost:5432/dev
+API_KEY: dev_key_123
+DEBUG: true
+PORT: 3000
+NODE_ENV: development
+```
+
+## Use Cases
+
+<Grid cols={2}>
+  <Card title="🔧 Development Setup">
+    Quickly set up development environment with local database and API keys.
+  </Card>
+  <Card title="🚀 Production Deployment">
+    Securely deploy production environment variables with proper encryption.
+  </Card>
+  <Card title="🔄 Environment Migration">
+    Migrate variables between environments or projects.
+  </Card>
+  <Card title="📊 Bulk Operations">
+    Import large sets of variables from configuration files.
+  </Card>
+</Grid>
+
+## Integration Examples
+
+### CI/CD Pipeline
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install EnvFly CLI
+        run: npm install -g envfly-cli
+
+      - name: Login to EnvFly
+        run: |
+          echo ${{ secrets.ENVFLY_API_KEY }} | envfly login
+
+      - name: Push Production Variables
+        run: |
+          envfly push production DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          envfly push production API_KEY="${{ secrets.API_KEY }}"
+          envfly push production LOG_LEVEL="info"
+
+      - name: Deploy Application
+        run: |
+          envfly pull production
+          npm run deploy
+```
+
+### Scripting
+
+```bash
+#!/bin/bash
+# setup-environments.sh
+
+echo "Setting up development environment..."
+
+# Development variables
+envfly push development DATABASE_URL="postgresql://localhost:5432/dev" --description "Local development database"
+envfly push development API_KEY="dev_key_123" --description "Development API key"
+envfly push development DEBUG="true" --description "Enable debug mode"
+envfly push development PORT="3000" --description "Application port"
+
+echo "Setting up staging environment..."
+
+# Staging variables
+envfly push staging DATABASE_URL="postgresql://staging:5432/staging" --description "Staging database"
+envfly push staging API_KEY="staging_key_456" --description "Staging API key"
+envfly push staging DEBUG="false" --description "Disable debug mode"
+envfly push staging PORT="3000" --description "Application port"
+
+echo "Environments setup complete!"
+```
+
+### Team Collaboration
+
+```bash
+# Team lead setting up shared variables
+envfly push development SHARED_API_URL="https://api.company.com" --description "Shared API endpoint"
+envfly push development TEAM_EMAIL="team@company.com" --description "Team contact email"
+
+# Developer adding personal variables
+envfly push development PERSONAL_API_KEY="my_dev_key" --description "Personal development API key"
+```
+
+## Error Handling
+
+<AccordionGroup>
+  <Accordion title="Environment Not Found">
+    **Error**: `Environment 'production' not found` **Solution**: Create the
+    environment first: ```bash envfly init # Then push variables envfly push
+    production DATABASE_URL="your-db-url" ```
+  </Accordion>
+
+  <Accordion title="Permission Denied">
+    **Error**: `Permission denied: Cannot push to environment 'production'`
+    **Solution**: Check your team permissions or contact your admin.
+  </Accordion>
+
+  <Accordion title="File Not Found">
+    **Error**: `File '.env' not found` **Solution**: Ensure the file exists and
+    path is correct: ```bash ls -la .env envfly push development --file .env ```
+  </Accordion>
+
+  <Accordion title="Invalid File Format">
+    **Error**: `Invalid file format. Supported: .env, .json, .yaml, .yml`
+    **Solution**: Use supported file formats or check file syntax.
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Callout type="info">
+  **Security Tip**: Always use descriptive names and add descriptions to
+  sensitive variables for better audit trails.
+</Callout>
+
+<AccordionGroup>
+  <Accordion title="Variable Naming">
+    - Use UPPER_CASE for environment variables - Use descriptive names (e.g.,
+    `DATABASE_URL` not `DB`) - Use consistent naming across environments -
+    Prefix with environment if needed (e.g., `DEV_API_KEY`, `PROD_API_KEY`)
+  </Accordion>
+
+  <Accordion title="Security">
+    - Never commit sensitive values to version control - Use different values
+    for different environments - Rotate secrets regularly - Use descriptive
+    names for audit purposes
+  </Accordion>
+
+  <Accordion title="Organization">
+    - Group related variables together - Use consistent environment names -
+    Document variable purposes with descriptions - Keep environment-specific
+    variables separate
+  </Accordion>
+</AccordionGroup>
+
+## Related Commands
+
+<Grid cols={3}>
+  <Card title="envfly pull" href="/commands/pull">
+    Download variables to local .env file.
+  </Card>
+  <Card title="envfly list" href="/commands/list">
+    List all environments and variables.
+  </Card>
+  <Card title="envfly history" href="/commands/history">
+    View change history for variables.
+  </Card>
+</Grid>{" "}

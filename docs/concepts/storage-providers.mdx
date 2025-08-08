@@ -1,0 +1,421 @@
+---
+title: "Storage Providers"
+description: "Understanding storage providers in EnvFly CLI"
+---
+
+# Storage Providers
+
+EnvFly CLI supports multiple storage providers for your environment variables, giving you flexibility to choose the solution that best fits your infrastructure and security requirements.
+
+## Overview
+
+Storage providers are the backend systems where your encrypted environment variables are stored. Each provider offers different benefits in terms of:
+
+- **Security**: Encryption at rest and in transit
+- **Performance**: Access speed and availability
+- **Cost**: Storage and bandwidth costs
+- **Integration**: Native integration with your existing infrastructure
+- **Compliance**: Meeting regulatory requirements
+
+## Available Providers
+
+<Grid cols={2}>
+  <Card title="Git" href="/providers/git">
+    Store variables in Git repositories with full version control and
+    collaboration features.
+  </Card>
+  <Card title="AWS S3" href="/providers/aws">
+    Use Amazon S3 for scalable, reliable cloud storage with advanced security
+    features.
+  </Card>
+  <Card title="Azure Blob" href="/providers/azure">
+    Leverage Microsoft Azure Blob Storage for enterprise-grade cloud storage.
+  </Card>
+  <Card title="Google Cloud" href="/providers/google">
+    Use Google Cloud Storage for high-performance, globally distributed storage.
+  </Card>
+  <Card title="EnvFly Cloud" href="/providers/envfly-cloud">
+    Managed service with built-in team collaboration, audit logs, and advanced
+    features.
+  </Card>
+</Grid>
+
+## Provider Comparison
+
+<Table>
+  <TableHead>
+    <TableRow>
+      <TableHeader>Provider</TableHeader>
+      <TableHeader>Security</TableHeader>
+      <TableHeader>Performance</TableHeader>
+      <TableHeader>Cost</TableHeader>
+      <TableHeader>Features</TableHeader>
+    </TableRow>
+  </TableHead>
+  <TableBody>
+    <TableRow>
+      <TableCell>**Git**</TableCell>
+      <TableCell>🔒 Client-side encryption</TableCell>
+      <TableCell>⚡ Fast (local)</TableCell>
+      <TableCell>💰 Free</TableCell>
+      <TableCell>Version control, collaboration</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>**AWS S3**</TableCell>
+      <TableCell>🔒🔒 Server-side + client-side</TableCell>
+      <TableCell>⚡⚡ Very fast</TableCell>
+      <TableCell>💰💰 Low</TableCell>
+      <TableCell>Scalable, IAM integration</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>**Azure Blob**</TableCell>
+      <TableCell>🔒🔒 Server-side + client-side</TableCell>
+      <TableCell>⚡⚡ Very fast</TableCell>
+      <TableCell>💰💰 Low</TableCell>
+      <TableCell>Enterprise features, compliance</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>**Google Cloud**</TableCell>
+      <TableCell>🔒🔒 Server-side + client-side</TableCell>
+      <TableCell>⚡⚡⚡ Ultra fast</TableCell>
+      <TableCell>💰💰💰 Medium</TableCell>
+      <TableCell>Global distribution, analytics</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>**EnvFly Cloud**</TableCell>
+      <TableCell>🔒🔒🔒 Enterprise-grade</TableCell>
+      <TableCell>⚡⚡⚡ Ultra fast</TableCell>
+      <TableCell>💰💰💰💰 Higher</TableCell>
+      <TableCell>Teams, audit logs, webhooks</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+
+## Security Model
+
+### Client-Side Encryption
+
+All storage providers use client-side encryption by default:
+
+```mermaid
+graph LR
+    A[Your Variables] --> B[Client Encryption]
+    B --> C[Encrypted Data]
+    C --> D[Storage Provider]
+    D --> E[Encrypted Data]
+    E --> F[Client Decryption]
+    F --> G[Your Variables]
+```
+
+<AccordionGroup>
+  <Accordion title="Encryption Algorithm">
+    **AES-256-GCM** with PBKDF2 key derivation - **Key Size**: 256 bits -
+    **Mode**: GCM (Galois/Counter Mode) - **Key Derivation**: PBKDF2 with
+    100,000 iterations - **Salt**: Random 32-byte salt per variable
+  </Accordion>
+
+  <Accordion title="Key Management">
+    - **Master Key**: Derived from your password/API key - **Variable Keys**:
+    Unique per variable - **Key Storage**: Never stored on server - **Key
+    Rotation**: Automatic with password change
+  </Accordion>
+
+  <Accordion title="Zero-Knowledge Architecture">
+    - Server cannot decrypt your data - Only you have access to encryption keys
+    - No backdoor access possible - Compliant with strict security requirements
+  </Accordion>
+</AccordionGroup>
+
+## Provider Selection
+
+### When to Use Git
+
+<Callout type="info">
+  **Best for**: Small teams, open source projects, version control enthusiasts
+</Callout>
+
+**Advantages**:
+
+- ✅ Free and unlimited
+- ✅ Full version control
+- ✅ Works offline
+- ✅ Familiar Git workflow
+- ✅ Easy backup and migration
+
+**Considerations**:
+
+- ⚠️ Repository size limits
+- ⚠️ No built-in team features
+- ⚠️ Manual access management
+
+### When to Use AWS S3
+
+<Callout type="info">
+  **Best for**: AWS users, enterprise environments, high availability
+  requirements
+</Callout>
+
+**Advantages**:
+
+- ✅ Highly available and durable
+- ✅ Advanced security features
+- ✅ IAM integration
+- ✅ Cost-effective at scale
+- ✅ Global distribution
+
+**Considerations**:
+
+- ⚠️ Requires AWS account
+- ⚠️ Learning curve for IAM
+- ⚠️ Potential costs at scale
+
+### When to Use Azure Blob
+
+<Callout type="info">
+  **Best for**: Microsoft ecosystem, enterprise compliance, hybrid cloud
+</Callout>
+
+**Advantages**:
+
+- ✅ Enterprise-grade security
+- ✅ Compliance certifications
+- ✅ Active Directory integration
+- ✅ Hybrid cloud support
+- ✅ Advanced monitoring
+
+**Considerations**:
+
+- ⚠️ Requires Azure subscription
+- ⚠️ Microsoft ecosystem lock-in
+- ⚠️ Learning curve for Azure services
+
+### When to Use Google Cloud
+
+<Callout type="info">
+  **Best for**: Google Cloud users, global applications, analytics needs
+</Callout>
+
+**Advantages**:
+
+- ✅ Global distribution
+- ✅ Advanced analytics
+- ✅ Strong consistency
+- ✅ Cost optimization features
+- ✅ Machine learning integration
+
+**Considerations**:
+
+- ⚠️ Requires Google Cloud account
+- ⚠️ Google ecosystem integration
+- ⚠️ Potential vendor lock-in
+
+### When to Use EnvFly Cloud
+
+<Callout type="info">
+  **Best for**: Teams, compliance requirements, managed service preference
+</Callout>
+
+**Advantages**:
+
+- ✅ Built-in team collaboration
+- ✅ Audit logs and compliance
+- ✅ Webhooks and integrations
+- ✅ Managed service
+- ✅ Advanced features
+
+**Considerations**:
+
+- ⚠️ Higher cost
+- ⚠️ Vendor dependency
+- ⚠️ Internet connectivity required
+
+## Configuration
+
+### Provider Setup
+
+Each provider requires specific configuration in your `.envfly` file:
+
+```json
+{
+  "project": {
+    "name": "my-project",
+    "storage": {
+      "provider": "git",
+      "config": {
+        "repository": "git@github.com:company/env-vars.git",
+        "branch": "main"
+      }
+    }
+  }
+}
+```
+
+### Provider-Specific Configuration
+
+<AccordionGroup>
+  <Accordion title="Git Configuration">
+    ```json
+    {
+      "provider": "git",
+      "config": {
+        "repository": "git@github.com:company/env-vars.git",
+        "branch": "main",
+        "path": "environments"
+      }
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="AWS S3 Configuration">
+    ```json
+    {
+      "provider": "aws",
+      "config": {
+        "bucket": "my-env-vars",
+        "region": "us-east-1",
+        "prefix": "environments/"
+      }
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Azure Blob Configuration">
+    ```json
+    {
+      "provider": "azure",
+      "config": {
+        "account": "myenvvars",
+        "container": "environments",
+        "connectionString": "DefaultEndpointsProtocol=https;..."
+      }
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Google Cloud Configuration">
+    ```json
+    {
+      "provider": "google",
+      "config": {
+        "bucket": "my-env-vars",
+        "project": "my-project",
+        "prefix": "environments/"
+      }
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="EnvFly Cloud Configuration">
+    ```json
+    {
+      "provider": "envfly-cloud",
+      "config": {
+        "projectId": "proj_123456",
+        "apiEndpoint": "https://api.envfly.io"
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Migration Between Providers
+
+### Export from Current Provider
+
+```bash
+# Export all environments to JSON
+envfly export --format json > environments.json
+
+# Export specific environment
+envfly export development --format json > dev-env.json
+```
+
+### Import to New Provider
+
+```bash
+# Initialize with new provider
+envfly init --provider aws
+
+# Import environments
+envfly import --file environments.json
+```
+
+### Migration Script
+
+```bash
+#!/bin/bash
+# migrate-provider.sh
+
+echo "Migrating from Git to AWS S3..."
+
+# Export current data
+envfly export --format json > migration-backup.json
+
+# Initialize new provider
+envfly init --provider aws --bucket my-new-env-vars
+
+# Import data
+envfly import --file migration-backup.json
+
+echo "Migration complete!"
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Provider Selection">
+    - **Start Simple**: Use Git for small projects - **Scale Up**: Move to cloud
+    providers as you grow - **Consider Compliance**: Choose providers that meet
+    your requirements - **Plan for Growth**: Select providers that can scale
+    with your needs
+  </Accordion>
+
+  <Accordion title="Security">
+    - **Enable Encryption**: Always use client-side encryption - **Access
+    Control**: Implement proper access controls - **Regular Audits**: Review
+    access logs regularly - **Backup Strategy**: Maintain backups across
+    providers
+  </Accordion>
+
+  <Accordion title="Performance">
+    - **Choose Region**: Select storage in your application's region - **CDN**:
+    Use CDN for global applications - **Caching**: Implement local caching where
+    appropriate - **Monitoring**: Monitor access patterns and performance
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Connection Issues">
+    **Problem**: Cannot connect to storage provider **Solutions**: - Check
+    network connectivity - Verify credentials and permissions - Test with
+    provider's CLI tools - Check firewall settings
+  </Accordion>
+
+  <Accordion title="Permission Errors">
+    **Problem**: Access denied to storage **Solutions**: - Verify IAM roles and
+    policies - Check API keys and tokens - Review access control lists - Contact
+    provider support
+  </Accordion>
+
+  <Accordion title="Performance Issues">
+    **Problem**: Slow access to variables **Solutions**: - Check network latency
+    - Consider CDN or caching - Optimize provider configuration - Monitor
+    resource usage
+  </Accordion>
+</AccordionGroup>
+
+## Related Topics
+
+<Grid cols={3}>
+  <Card title="Provider Guides" href="/providers/git">
+    Detailed setup guides for each provider.
+  </Card>
+  <Card title="Security" href="/concepts/security">
+    Learn about encryption and security features.
+  </Card>
+  <Card title="Configuration" href="/configuration/envfly-file">
+    Configure storage providers in your project.
+  </Card>
+</Grid>{" "}

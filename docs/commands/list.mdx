@@ -1,0 +1,295 @@
+---
+title: "envfly list"
+description: "List all environments and their variables"
+---
+
+# envfly list
+
+List all environments and their variables in your EnvFly project.
+
+## Usage
+
+```bash
+envfly list [options]
+```
+
+## Description
+
+The `list` command displays all environments in your project along with their variables. This is useful for:
+
+- **Overview**: Get a quick overview of all environments
+- **Audit**: Review what variables are stored in each environment
+- **Debugging**: Check if variables are properly stored
+- **Documentation**: Generate documentation of your environment structure
+
+## Options
+
+<AccordionGroup>
+  <Accordion title="--environment, -e">
+    **Type**: `string` List variables for a specific environment only. ```bash
+    envfly list --environment production envfly list -e development ```
+  </Accordion>
+
+  <Accordion title="--format, -f">
+    **Type**: `string` (json, yaml, table) **Default**: `table` Output format
+    for the list. ```bash envfly list --format json envfly list -f yaml envfly
+    list --format table ```
+  </Accordion>
+
+  <Accordion title="--show-values, -v">
+    **Type**: `boolean` **Default**: `false` Show actual variable values (use
+    with caution). ```bash envfly list --show-values envfly list -v ```
+  </Accordion>
+
+  <Accordion title="--filter, -F">
+    **Type**: `string` Filter variables by name pattern. ```bash envfly list
+    --filter "DB_*" envfly list -F "API_*" ```
+  </Accordion>
+
+  <Accordion title="--sort, -s">
+    **Type**: `string` (name, environment, updated) **Default**: `environment`
+    Sort order for the output. ```bash envfly list --sort name envfly list -s
+    updated ```
+  </Accordion>
+</AccordionGroup>
+
+## Examples
+
+### Basic List
+
+```bash
+$ envfly list
+┌─────────────┬─────────────┬─────────────┬─────────────────────┐
+│ Environment │ Variable    │ Type        │ Last Updated        │
+├─────────────┼─────────────┼─────────────┼─────────────────────┤
+│ development │ DATABASE_URL│ string      │ 2024-01-15 10:30:00 │
+│ development │ API_KEY     │ string      │ 2024-01-15 10:30:00 │
+│ development │ DEBUG       │ boolean     │ 2024-01-15 10:30:00 │
+│ production  │ DATABASE_URL│ string      │ 2024-01-15 09:15:00 │
+│ production  │ API_KEY     │ string      │ 2024-01-15 09:15:00 │
+│ staging     │ DATABASE_URL│ string      │ 2024-01-15 08:45:00 │
+│ staging     │ API_KEY     │ string      │ 2024-01-15 08:45:00 │
+└─────────────┴─────────────┴─────────────┴─────────────────────┘
+```
+
+### List Specific Environment
+
+```bash
+$ envfly list --environment production
+┌─────────────┬─────────────┬─────────────┬─────────────────────┐
+│ Environment │ Variable    │ Type        │ Last Updated        │
+├─────────────┼─────────────┼─────────────┼─────────────────────┤
+│ production  │ DATABASE_URL│ string      │ 2024-01-15 09:15:00 │
+│ production  │ API_KEY     │ string      │ 2024-01-15 09:15:00 │
+│ production  │ LOG_LEVEL   │ string      │ 2024-01-15 09:15:00 │
+└─────────────┴─────────────┴─────────────┴─────────────────────┘
+```
+
+### JSON Output
+
+```bash
+$ envfly list --format json
+{
+  "environments": {
+    "development": {
+      "variables": {
+        "DATABASE_URL": {
+          "type": "string",
+          "updated": "2024-01-15T10:30:00Z",
+          "encrypted": true
+        },
+        "API_KEY": {
+          "type": "string",
+          "updated": "2024-01-15T10:30:00Z",
+          "encrypted": true
+        }
+      }
+    },
+    "production": {
+      "variables": {
+        "DATABASE_URL": {
+          "type": "string",
+          "updated": "2024-01-15T09:15:00Z",
+          "encrypted": true
+        },
+        "API_KEY": {
+          "type": "string",
+          "updated": "2024-01-15T09:15:00Z",
+          "encrypted": true
+        }
+      }
+    }
+  }
+}
+```
+
+### Filter Variables
+
+```bash
+$ envfly list --filter "DB_*"
+┌─────────────┬─────────────┬─────────────┬─────────────────────┐
+│ Environment │ Variable    │ Type        │ Last Updated        │
+├─────────────┼─────────────┼─────────────┼─────────────────────┤
+│ development │ DB_HOST     │ string      │ 2024-01-15 10:30:00 │
+│ development │ DB_PORT     │ number      │ 2024-01-15 10:30:00 │
+│ development │ DB_NAME     │ string      │ 2024-01-15 10:30:00 │
+│ production  │ DB_HOST     │ string      │ 2024-01-15 09:15:00 │
+│ production  │ DB_PORT     │ number      │ 2024-01-15 09:15:00 │
+│ production  │ DB_NAME     │ string      │ 2024-01-15 09:15:00 │
+└─────────────┴─────────────┴─────────────┴─────────────────────┘
+```
+
+### Show Values (Use with Caution)
+
+```bash
+$ envfly list --show-values --environment development
+┌─────────────┬─────────────┬─────────────┬─────────────────────┬─────────────────────┐
+│ Environment │ Variable    │ Type        │ Last Updated        │ Value               │
+├─────────────┼─────────────┼─────────────┼─────────────────────┼─────────────────────┤
+│ development │ DATABASE_URL│ string      │ 2024-01-15 10:30:00 │ postgresql://lo...  │
+│ development │ API_KEY     │ string      │ 2024-01-15 10:30:00 │ dev_key_123         │
+│ development │ DEBUG       │ boolean     │ 2024-01-15 10:30:00 │ true                │
+└─────────────┴─────────────┴─────────────┴─────────────────────┴─────────────────────┘
+```
+
+## Use Cases
+
+<Grid cols={2}>
+  <Card title="🔍 Environment Audit">
+    Review all variables across environments to ensure consistency and security.
+  </Card>
+  <Card title="📊 Documentation">
+    Generate documentation of your environment structure for team onboarding.
+  </Card>
+  <Card title="🐛 Debugging">
+    Check if variables are properly stored and accessible.
+  </Card>
+  <Card title="🔒 Security Review">
+    Audit sensitive variables and their distribution across environments.
+  </Card>
+</Grid>
+
+## Integration Examples
+
+### CI/CD Pipeline
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: List Production Variables
+        run: |
+          envfly list --environment production --format json > env-audit.json
+
+      - name: Deploy with Variables
+        run: |
+          envfly pull production
+          npm run deploy
+```
+
+### Scripting
+
+```bash
+#!/bin/bash
+# audit-environments.sh
+
+echo "=== Environment Audit Report ==="
+echo "Generated: $(date)"
+echo
+
+# List all environments
+echo "All Environments:"
+envfly list --format table
+
+echo
+
+# Check for sensitive variables
+echo "Sensitive Variables Check:"
+envfly list --filter "*KEY*" --filter "*SECRET*" --filter "*PASSWORD*"
+
+echo
+
+# Generate JSON report
+envfly list --format json > env-audit-$(date +%Y%m%d).json
+echo "JSON report saved to env-audit-$(date +%Y%m%d).json"
+```
+
+### Team Collaboration
+
+```bash
+# Team lead reviewing environments
+envfly list --sort updated
+
+# Developer checking their environment
+envfly list --environment development --show-values
+
+# DevOps engineer auditing production
+envfly list --environment production --format json | jq '.environments.production.variables | keys'
+```
+
+## Error Handling
+
+<AccordionGroup>
+  <Accordion title="No Environments Found">
+    **Error**: `No environments found in this project` **Solution**: Initialize
+    the project first: ```bash envfly init envfly push development
+    DATABASE_URL="your-db-url" ```
+  </Accordion>
+
+  <Accordion title="Environment Not Found">
+    **Error**: `Environment 'production' not found` **Solution**: Check
+    available environments: ```bash envfly list ```
+  </Accordion>
+
+  <Accordion title="Permission Denied">
+    **Error**: `Permission denied: Cannot access environment 'production'`
+    **Solution**: Check your team permissions or contact your admin.
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Callout type="warning">
+  **Security Warning**: Use `--show-values` with extreme caution, especially in
+  production environments or shared terminals.
+</Callout>
+
+<AccordionGroup>
+  <Accordion title="Regular Audits">
+    - Run `envfly list` regularly to audit your environments - Use JSON format
+    for automated processing - Filter sensitive variables for security reviews
+  </Accordion>
+
+  <Accordion title="Team Communication">
+    - Share environment structure with new team members - Document variable
+    naming conventions - Use consistent environment names across projects
+  </Accordion>
+
+  <Accordion title="Automation">
+    - Integrate listing into CI/CD pipelines - Generate automated reports - Use
+    for compliance and audit purposes
+  </Accordion>
+</AccordionGroup>
+
+## Related Commands
+
+<Grid cols={3}>
+  <Card title="envfly push" href="/commands/push">
+    Add or update variables in environments.
+  </Card>
+  <Card title="envfly pull" href="/commands/pull">
+    Download variables to local .env file.
+  </Card>
+  <Card title="envfly history" href="/commands/history">
+    View change history for variables.
+  </Card>
+</Grid>{" "}

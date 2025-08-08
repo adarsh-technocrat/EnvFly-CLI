@@ -1,0 +1,197 @@
+---
+title: "Quick Start"
+description: "Get up and running with EnvFly CLI in 5 minutes"
+---
+
+# Quick Start Guide
+
+Get EnvFly CLI up and running in just 5 minutes! This guide will walk you through the essential steps to start managing your environment variables securely.
+
+<Steps>
+  <Step title="Install EnvFly CLI">
+    Choose your preferred installation method:
+    <Tabs>
+      <Tab title="npm">```bash npm install -g envfly-cli ```</Tab>
+      <Tab title="yarn">```bash yarn global add envfly-cli ```</Tab>
+      <Tab title="Homebrew">```bash brew install envfly-cli ```</Tab>
+      <Tab title="Direct Download">
+        ```bash curl -fsSL
+        https://github.com/adarsh-technocrat/EnvFly-CLI/releases/latest/download/envfly-cli.sh
+        | bash ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Authenticate">
+    Login to EnvFly Cloud Service: ```bash envfly login ``` You'll be prompted
+    for your API key. Get one from [app.envfly.io](https://app.envfly.io).
+  </Step>
+
+  <Step title="Initialize Project">
+    Navigate to your project and initialize EnvFly: ```bash cd your-project
+    envfly init ``` This creates a `.envfly` configuration file.
+  </Step>
+
+  <Step title="Add Environment Variables">
+    Create your first environment: ```bash # Add variables to development
+    environment envfly push development
+    DATABASE_URL="postgresql://localhost:5432/dev" envfly push development
+    API_KEY="dev_key_123" # Add variables to production environment envfly push
+    production DATABASE_URL="postgresql://prod-server:5432/prod" envfly push
+    production API_KEY="prod_key_456" ```
+  </Step>
+
+  <Step title="Pull Variables">
+    Pull environment variables to your local `.env` file: ```bash # Pull
+    development environment envfly pull development # Or pull production (be
+    careful!) envfly pull production ```
+  </Step>
+</Steps>
+
+## What Just Happened?
+
+<Grid cols={2}>
+  <Card title="🔐 Secure Storage" href="/concepts/security">
+    Your environment variables are encrypted and stored securely in your chosen
+    storage provider.
+  </Card>
+  <Card title="🔄 Version Control" href="/concepts/environments">
+    All changes are tracked with full history and audit logs.
+  </Card>
+  <Card title="👥 Team Ready" href="/concepts/teams">
+    Share environments with your team members securely.
+  </Card>
+  <Card title="🚀 CI/CD Ready" href="/examples/ci-cd">
+    Integrate with your CI/CD pipeline for automated deployments.
+  </Card>
+</Grid>
+
+## Next Steps
+
+<AccordionGroup>
+  <Accordion title="Explore Commands">
+    <Steps>
+      <Step title="List Environments">
+        ```bash
+        envfly list
+        ```
+      </Step>
+      <Step title="View History">
+        ```bash
+        envfly history
+        ```
+      </Step>
+      <Step title="Create Team">
+        ```bash
+        envfly team create "My Team"
+        ```
+      </Step>
+      <Step title="Invite Members">
+        ```bash
+        envfly team invite alice@company.com
+        ```
+    </Steps>
+  </Accordion>
+  
+  <Accordion title="Advanced Configuration">
+    <Steps>
+      <Step title="Custom Storage">
+        Configure AWS S3, Azure Blob, or Git repository as storage.
+      </Step>
+      <Step title="Encryption Keys">
+        Set up custom encryption keys for enhanced security.
+      </Step>
+      <Step title="Backup Strategy">
+        Configure automatic backups and disaster recovery.
+      </Step>
+    </Steps>
+  </Accordion>
+  
+  <Accordion title="Integration Examples">
+    <Steps>
+      <Step title="Node.js Project">
+        See how to integrate with Express.js applications.
+      </Step>
+      <Step title="React App">
+        Learn frontend environment management.
+      </Step>
+      <Step title="Microservices">
+        Manage environments across multiple services.
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+## Common Use Cases
+
+<Grid cols={3}>
+  <Card title="Development" href="/examples/nodejs-project">
+    <Steps>
+      <Step>Initialize project</Step>
+      <Step>Add dev variables</Step>
+      <Step>Share with team</Step>
+    </Steps>
+  </Card>
+  <Card title="Staging" href="/examples/react-app">
+    <Steps>
+      <Step>Create staging env</Step>
+      <Step>Configure staging DB</Step>
+      <Step>Test deployment</Step>
+    </Steps>
+  </Card>
+  <Card title="Production" href="/examples/microservices">
+    <Steps>
+      <Step>Secure production</Step>
+      <Step>Set up monitoring</Step>
+      <Step>Automate deployment</Step>
+    </Steps>
+  </Card>
+</Grid>
+
+## Troubleshooting
+
+<Callout type="info">
+  If you encounter any issues during setup, check our [troubleshooting
+  guide](/troubleshooting/common-issues) or join our [Discord
+  community](https://discord.gg/envfly) for help.
+</Callout>
+
+<AccordionGroup>
+  <Accordion title="Installation Issues">
+    **Problem**: `command not found: envfly` **Solution**: Ensure the
+    installation directory is in your PATH: ```bash echo $PATH which envfly ```
+  </Accordion>
+
+  <Accordion title="Authentication Issues">
+    **Problem**: `Authentication failed` **Solution**: Verify your API key and
+    try again: ```bash envfly logout envfly login ```
+  </Accordion>
+
+  <Accordion title="Permission Issues">
+    **Problem**: `Could not store API key securely` **Solution**: Grant keychain
+    access to your terminal application.
+  </Accordion>
+</AccordionGroup>
+
+## Ready to Dive Deeper?
+
+<Grid cols={2}>
+  <Card title="📖 Full Documentation" href="/commands/init">
+    Explore all commands and features in detail.
+  </Card>
+  <Card title="🔧 Configuration Guide" href="/configuration/envfly-file">
+    Learn about advanced configuration options.
+  </Card>
+  <Card title="🚀 Deployment Guide" href="/deployment/backend-setup">
+    Set up your own EnvFly backend instance.
+  </Card>
+  <Card title="💡 Best Practices" href="/best-practices/security">
+    Follow security and collaboration best practices.
+  </Card>
+</Grid>
+
+<Callout type="success">
+  Congratulations! You've successfully set up EnvFly CLI. Your environment
+  variables are now secure, version-controlled, and ready for team
+  collaboration.
+</Callout>{" "}

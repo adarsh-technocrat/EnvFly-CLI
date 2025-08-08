@@ -1,3 +1,25 @@
+<div align="center">
+  <img src="https://img.shields.io/badge/EnvFly-CLI-emerald?style=for-the-badge&logo=terminal" alt="EnvFly CLI" />
+  <h1 align="center">🚀 EnvFly CLI</h1>
+  <p align="center">
+    <strong>Git for environment variables • Secure • Fast • Team-friendly</strong>
+  </p>
+  <div align="center">
+    <img src="https://img.shields.io/badge/Secure%20Auth-API%20Key%20Storage-emerald?style=flat-square" alt="Secure Auth" />
+    <img src="https://img.shields.io/badge/Encryption-AES--256--GCM-emerald?style=flat-square" alt="AES-256 Encryption" />
+    <img src="https://img.shields.io/badge/Team%20Sync-Collaborative-emerald?style=flat-square" alt="Team Sync" />
+    <img src="https://img.shields.io/badge/Cross--Platform-Windows%20%7C%20macOS%20%7C%20Linux-emerald?style=flat-square" alt="Cross-Platform" />
+  </div>
+  <br/>
+  <div align="center">
+    <img src="https://img.shields.io/badge/Node.js-14+-green?style=flat-square&logo=node.js" alt="Node.js" />
+    <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License" />
+    <img src="https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square" alt="Version" />
+  </div>
+</div>
+
+---
+
 # EnvFly CLI
 
 A lightweight Node.js command-line tool for syncing environment variables across teams and projects. Think of it as "Git for environment variables."

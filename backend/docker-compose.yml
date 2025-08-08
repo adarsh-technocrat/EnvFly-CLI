@@ -39,12 +39,18 @@ services:
       RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       # Email configuration (optional)
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM: ${RESEND_FROM:-noreply@envfly.io}
+      RESEND_DOMAIN: ${RESEND_DOMAIN}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_SECURE: ${SMTP_SECURE:-false}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
       EMAIL_FROM: ${EMAIL_FROM:-noreply@envfly.io}
+      EMAIL_REPLY_TO: ${EMAIL_REPLY_TO:-support@envfly.io}
+      FRONTEND_URL: ${FRONTEND_URL:-https://app.envfly.io}
     ports:
       - "3000:3000"
     volumes:

@@ -68,6 +68,11 @@ MONGODB_URI=mongodb://admin:password@mongodb:27017/envfly?authSource=admin
 NODE_ENV=production
 PORT=3000
 CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
+
+# Email Configuration (Optional - for team invites and notifications)
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=your-resend-api-key
+RESEND_FROM=noreply@envfly.io
 ```
 
 ### 3. Start Services
@@ -140,6 +145,61 @@ npm run dev
 # Production
 npm start
 ```
+
+## 📧 Email Configuration
+
+The backend supports email notifications for team invitations, password resets, and environment change alerts. You can configure either Resend (recommended) or SMTP.
+
+### Option 1: Resend (Recommended - Easier Setup)
+
+1. **Sign up at [resend.com](https://resend.com)**
+2. **Get your API key** from the dashboard
+3. **Configure your domain** or use the provided sandbox domain
+
+```env
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=your-resend-api-key
+RESEND_FROM=noreply@envfly.io
+RESEND_DOMAIN=yourdomain.com  # Optional, for custom domain
+```
+
+**Benefits of Resend:**
+
+- ✅ No SMTP configuration needed
+- ✅ Better deliverability
+- ✅ Built-in analytics
+- ✅ Easy domain verification
+- ✅ Free tier available
+
+### Option 2: SMTP (Legacy)
+
+```env
+EMAIL_PROVIDER=smtp
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+EMAIL_FROM=noreply@envfly.io
+```
+
+**Note:** For Gmail, you'll need to use an App Password instead of your regular password.
+
+### Additional Email Settings
+
+```env
+EMAIL_REPLY_TO=support@envfly.io
+FRONTEND_URL=https://app.envfly.io
+```
+
+### Email Templates
+
+The backend includes beautiful HTML email templates for:
+
+- 🎉 Welcome emails for new users
+- 👥 Team invitation emails
+- 🔐 Password reset emails
+- 📊 Environment change notifications
 
 ## 📚 API Documentation
 
@@ -382,19 +442,26 @@ curl -X POST http://localhost:3000/api/v1/auth/login \
 
 ## 📝 Environment Variables
 
-| Variable         | Description                    | Default       | Required |
-| ---------------- | ------------------------------ | ------------- | -------- |
-| `NODE_ENV`       | Environment mode               | `development` | No       |
-| `PORT`           | Server port                    | `3000`        | No       |
-| `MONGODB_URI`    | MongoDB connection string      | -             | Yes      |
-| `JWT_SECRET`     | JWT signing secret             | -             | Yes      |
-| `JWT_EXPIRES_IN` | JWT expiration time            | `7d`          | No       |
-| `CORS_ORIGINS`   | Allowed CORS origins           | `localhost`   | No       |
-| `RATE_LIMIT_MAX` | Rate limit requests per window | `100`         | No       |
-| `LOG_LEVEL`      | Logging level                  | `info`        | No       |
-| `SMTP_HOST`      | SMTP server host               | -             | No       |
-| `SMTP_USER`      | SMTP username                  | -             | No       |
-| `SMTP_PASS`      | SMTP password                  | -             | No       |
+| Variable         | Description                    | Default                 | Required |
+| ---------------- | ------------------------------ | ----------------------- | -------- |
+| `NODE_ENV`       | Environment mode               | `development`           | No       |
+| `PORT`           | Server port                    | `3000`                  | No       |
+| `MONGODB_URI`    | MongoDB connection string      | -                       | Yes      |
+| `JWT_SECRET`     | JWT signing secret             | -                       | Yes      |
+| `JWT_EXPIRES_IN` | JWT expiration time            | `7d`                    | No       |
+| `CORS_ORIGINS`   | Allowed CORS origins           | `localhost`             | No       |
+| `RATE_LIMIT_MAX` | Rate limit requests per window | `100`                   | No       |
+| `LOG_LEVEL`      | Logging level                  | `info`                  | No       |
+| `EMAIL_PROVIDER` | Email provider (resend/smtp)   | `resend`                | No       |
+| `RESEND_API_KEY` | Resend API key                 | -                       | No       |
+| `RESEND_FROM`    | Resend from email address      | `noreply@envfly.io`     | No       |
+| `RESEND_DOMAIN`  | Resend domain                  | -                       | No       |
+| `SMTP_HOST`      | SMTP server host               | -                       | No       |
+| `SMTP_USER`      | SMTP username                  | -                       | No       |
+| `SMTP_PASS`      | SMTP password                  | -                       | No       |
+| `EMAIL_FROM`     | Default from email address     | `noreply@envfly.io`     | No       |
+| `EMAIL_REPLY_TO` | Reply-to email address         | `support@envfly.io`     | No       |
+| `FRONTEND_URL`   | Frontend application URL       | `https://app.envfly.io` | No       |
 
 ## 🤝 Contributing
 

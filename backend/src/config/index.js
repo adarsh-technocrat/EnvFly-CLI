@@ -32,16 +32,31 @@ const config = {
     saltLength: 64
   },
   
-  // Email configuration (for invites, notifications)
+  // Email configuration (SMTP and Resend)
   email: {
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: process.env.SMTP_PORT || 587,
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
+    // SMTP configuration (legacy)
+    smtp: {
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: process.env.SMTP_PORT || 587,
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      },
+      from: process.env.EMAIL_FROM || 'noreply@envfly.io'
     },
-    from: process.env.EMAIL_FROM || 'noreply@envfly.io'
+    // Resend configuration (recommended)
+    resend: {
+      apiKey: process.env.RESEND_API_KEY,
+      from: process.env.RESEND_FROM || 'noreply@envfly.io',
+      domain: process.env.RESEND_DOMAIN,
+      enabled: !!process.env.RESEND_API_KEY
+    },
+    // Email provider selection
+    provider: process.env.EMAIL_PROVIDER || 'resend', // 'smtp' or 'resend'
+    // Default settings
+    from: process.env.EMAIL_FROM || 'noreply@envfly.io',
+    replyTo: process.env.EMAIL_REPLY_TO || 'support@envfly.io'
   },
   
   // CORS configuration

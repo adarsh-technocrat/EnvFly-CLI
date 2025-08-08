@@ -51,6 +51,9 @@ Choose your cloud provider and run the corresponding script:
 
 - **Docker** installed and running
 - **Git** for cloning the repository
+- **Email Provider** (optional but recommended):
+  - Resend account and API key (recommended)
+  - Or SMTP credentials for email notifications
 
 ### AWS Prerequisites
 
@@ -206,6 +209,50 @@ jobs:
           aws configure set default.region us-east-1
           ./scripts/deploy-aws.sh
 ```
+
+## 📧 Email Configuration
+
+The deployment scripts support email notifications for team invitations, password resets, and environment changes. You can configure either Resend (recommended) or SMTP.
+
+### Option 1: Resend (Recommended)
+
+1. **Sign up at [resend.com](https://resend.com)**
+2. **Get your API key** from the dashboard
+3. **Set environment variables** before deployment:
+
+```bash
+export RESEND_API_KEY="your-resend-api-key"
+export RESEND_FROM="noreply@envfly.io"
+export RESEND_DOMAIN="yourdomain.com"  # Optional
+```
+
+### Option 2: SMTP
+
+```bash
+export SMTP_HOST="smtp.gmail.com"
+export SMTP_PORT="587"
+export SMTP_USER="your-email@gmail.com"
+export SMTP_PASS="your-app-password"
+export EMAIL_FROM="noreply@envfly.io"
+```
+
+### Email Provider Selection
+
+```bash
+# Use Resend (default)
+export EMAIL_PROVIDER="resend"
+
+# Or use SMTP
+export EMAIL_PROVIDER="smtp"
+```
+
+**Benefits of Resend:**
+
+- ✅ No SMTP configuration needed
+- ✅ Better deliverability
+- ✅ Built-in analytics
+- ✅ Easy domain verification
+- ✅ Free tier available
 
 ## 🚨 Troubleshooting
 

@@ -1,6 +1,7 @@
 # EnvFly CLI
 
 ![EnvFly CLI Banner](https://img.shields.io/badge/EnvFly-CLI-emerald?style=for-the-badge&logo=terminal)
+<img width="1727" height="318" alt="Screenshot 2025-08-08 at 2 28 54 PM" src="https://github.com/user-attachments/assets/10bfecd9-c42b-4e4f-bbe0-f8d4b3ac837c" />
 
 A lightweight Node.js command-line tool for syncing environment variables across teams and projects. Think of it as "Git for environment variables" - secure, fast, and team-friendly.
 

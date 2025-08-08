@@ -19,7 +19,14 @@
     "release:manual": "npm version",
     "clean": "rm -rf node_modules package-lock.json envfly-cli-*.tgz"
   },
-  "keywords": ["cli", "environment", "variables", "sync", "team", "devops"],
+  "keywords": [
+    "cli",
+    "environment",
+    "variables",
+    "sync",
+    "team",
+    "devops"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {

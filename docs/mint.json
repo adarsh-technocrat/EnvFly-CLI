@@ -50,8 +50,6 @@
       "group": "Core Concepts",
       "pages": [
         "concepts/environments",
-        "concepts/storage-providers",
-        "concepts/teams",
         "concepts/security"
       ]
     },
@@ -59,58 +57,13 @@
       "group": "Commands",
       "pages": [
         "commands/init",
-        "commands/login",
-        "commands/list",
-        "commands/push",
-        "commands/pull",
-        "commands/sync",
-        "commands/team",
-        "commands/history",
-        "commands/audit"
-      ]
-    },
-    {
-      "group": "Storage Providers",
-      "pages": [
-        "providers/git",
-        "providers/aws",
-        "providers/azure",
-        "providers/google",
-        "providers/envfly-cloud"
-      ]
-    },
-    {
-      "group": "Configuration",
-      "pages": [
-        "configuration/envfly-file",
-        "configuration/environment-variables",
-        "configuration/encryption"
-      ]
-    },
-    {
-      "group": "API Reference",
-      "pages": [
-        "api/authentication",
-        "api/teams",
-        "api/environments",
-        "api/projects"
+        "commands/login"
       ]
     },
     {
       "group": "Deployment",
       "pages": [
-        "deployment/backend-setup",
-        "deployment/azure-deployment",
-        "deployment/aws-deployment",
-        "deployment/docker"
-      ]
-    },
-    {
-      "group": "Examples",
-      "pages": [
-        "examples/nodejs-project",
-        "examples/react-app",
-        "examples/microservices"
+        "deployment/azure-deployment"
       ]
     }
   ],

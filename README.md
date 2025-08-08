@@ -404,7 +404,9 @@ npm install @google-cloud/secret-manager
 
 ## 📚 Documentation
 
-For comprehensive documentation, visit our [Mintlify documentation site](https://docs.envfly.io) or check the [docs/](./docs/) directory in this repository.
+For comprehensive documentation, visit the EnvFly Mintlify site: https://envfly.mintlify.app/
+
+You can also check the [docs/](./docs/) directory in this repository.
 
 ## 🤝 Contributing
 
@@ -420,7 +422,7 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-- 📖 [Documentation](https://docs.envfly.io)
+- 📖 Documentation: https://envfly.mintlify.app/
 - 💬 [Discord Community](https://discord.gg/envfly)
 - 🐛 [Issue Tracker](https://github.com/adarsh-technocrat/EnvFly-CLI/issues)
 - 📧 [Email Support](mailto:support@envfly.io)

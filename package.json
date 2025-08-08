@@ -56,12 +56,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/envfly-cli.git"
+    "url": "git+https://github.com/adarsh-technocrat/EnvFly-CLI.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/envfly-cli/issues"
+    "url": "https://github.com/adarsh-technocrat/EnvFly-CLI/issues"
   },
-  "homepage": "https://github.com/yourusername/envfly-cli#readme",
+  "homepage": "https://github.com/adarsh-technocrat/EnvFly-CLI#readme",
   "files": [
     "bin/",
     "src/",

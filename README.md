@@ -304,7 +304,88 @@ npm test
 
 # Build package
 npm run build
+
+# Clean build artifacts
+npm run clean
 ```
+
+## 🚀 Release Process
+
+### Automated Releases
+
+This project uses GitHub Actions for automated releases. The release process is triggered by:
+
+1. **Git Tags**: Push a tag starting with `v` (e.g., `v1.0.0`)
+2. **Manual Workflow**: Use the GitHub Actions manual workflow dispatch
+
+### Manual Release Commands
+
+```bash
+# Release a patch version (1.0.0 -> 1.0.1)
+npm run release:patch
+
+# Release a minor version (1.0.0 -> 1.1.0)
+npm run release:minor
+
+# Release a major version (1.0.0 -> 2.0.0)
+npm run release:major
+
+# Show current version
+npm run release:manual
+```
+
+### Using the Release Script
+
+For more control over the release process, use the custom release script:
+
+```bash
+# Release a patch version
+node scripts/release.js patch
+
+# Release a minor version
+node scripts/release.js minor
+
+# Release a major version
+node scripts/release.js major
+
+# Show current version
+node scripts/release.js version
+
+# Clean build artifacts
+node scripts/release.js clean
+```
+
+### Release Workflow
+
+1. **Tests**: All tests must pass before release
+2. **Version Update**: Automatically increments version in `package.json`
+3. **Changelog**: Updates `CHANGELOG.md` with release notes
+4. **Build**: Creates npm package
+5. **Git Operations**: Commits changes and creates git tag
+6. **GitHub Action**: Automatically publishes to npm and creates GitHub release
+
+### NPM Publishing
+
+The package is automatically published to npm when:
+
+- A git tag is pushed (e.g., `git tag v1.0.0 && git push --tags`)
+- The GitHub Action workflow completes successfully
+
+**Required Secrets:**
+
+- `NPM_TOKEN`: Your npm authentication token
+
+### Version Management
+
+This project follows [Semantic Versioning](https://semver.org/):
+
+- **Patch** (1.0.0 → 1.0.1): Bug fixes and minor improvements
+- **Minor** (1.0.0 → 1.1.0): New features, backward compatible
+- **Major** (1.0.0 → 2.0.0): Breaking changes
+
+### Changelog
+
+All releases are documented in [CHANGELOG.md](./CHANGELOG.md) following the [Keep a Changelog](https://keepachangelog.com/) format.
 
 ### Optional Dependencies
 

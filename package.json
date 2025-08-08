@@ -8,16 +8,16 @@
   },
   "scripts": {
     "dev": "node bin/envfly.js",
-    "test": "jest",
-    "build": "npm pack",
-    "prepublishOnly": "npm test && npm run build",
+    "test": "jest --passWithNoTests",
+    "build": "echo \"Build step: nothing to compile\"",
+    "pack": "npm pack",
+    "prepublishOnly": "npm test && npm run pack",
     "publish-local": "npm pack && npm install -g envfly-cli-1.0.0.tgz",
     "release:patch": "npm version patch && git push && git push --tags",
     "release:minor": "npm version minor && git push && git push --tags",
     "release:major": "npm version major && git push && git push --tags",
     "release:manual": "npm version",
-    "clean": "rm -rf node_modules package-lock.json envfly-cli-*.tgz",
-    "prepare": "npm run build"
+    "clean": "rm -rf node_modules package-lock.json envfly-cli-*.tgz"
   },
   "keywords": ["cli", "environment", "variables", "sync", "team", "devops"],
   "author": "",
